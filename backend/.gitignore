@@ -1,0 +1,30 @@
+# === Python / FastAPI ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.venv/
+env/
+venv/
+ENV/
+
+# SQLite database (puedes comentar si quieres subirla)
+*.db
+*.sqlite3
+
+# === Virtual environment ===
+*.egg-info/
+.eggs/
+
+# === Editor / OS files ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === Build outputs ===
+build/
+coverage/
