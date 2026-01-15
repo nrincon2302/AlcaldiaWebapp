@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+input, textarea, select, button {
+  @apply rounded-md border border-gray-300 px-3 py-2 text-sm outline-none;
+}
+
+label {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.btn {
+  @apply inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-white hover:bg-brand-fg transition;
+}
+
+.btn-outline {
+  @apply inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 transition;
+}
+
+.card {
+  @apply rounded-xl border border-gray-200 bg-white p-4 shadow-sm;
+}
+
+.badge {
+  @apply inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700;
+}

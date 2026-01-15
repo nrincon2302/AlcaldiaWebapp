@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Encuesta finalizada</title>
+  <style>
+    body { font-family: Inter, ui-sans-serif, system-ui; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; }
+    .box{ text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Gracias por responder</h1>
+    <p>A continuación, se le redirigirá para continuar con las demás encuestas.</p>
+  </div>
+  <!-- <script>
+    (function () {
+      try {
+        const params = new URLSearchParams(location.search);
+        const parentOrigin = params.get('parent_origin') || '*';
+        // Send a message to the opener window to notify that the survey completed.
+        if (window.opener && !window.opener.closed) {
+          try {
+            window.opener.postMessage({ type: 'PROYECTAMOS_SURVEY_SUBMIT', status: 201 }, parentOrigin === '*' ? '*' : parentOrigin);
+          } catch (err) {
+            // ignore
+          }
+        }
+      } catch (err) {
+        // ignore
+      }
+      // Optionally close the popup after a short delay to return control to the parent
+      setTimeout(function () { try { window.close(); } catch (e) {} }, 1500);
+    })();
+  </script> -->
+</body>
+</html>

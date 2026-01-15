@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Parametrización URLs virtual</title>
+
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 16px 24px 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    .page-header {
+    text-align: center;
+    background: #c20000;
+    padding: 10px;
+    margin-bottom: 16px;
+    color: #fff;
+    border-radius: 5px 5px 0 0;
+  }
+
+    .page-header img {
+      max-width: 260px;
+      height: auto;
+      display: block;
+      margin: 0 auto 6px;
+    }
+
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+
+    .filters label {
+      display: flex;
+      flex-direction: column;
+      min-width: 220px;
+    }
+
+    .filters span {
+      font-weight: bold;
+      margin-bottom: 3px;
+      color: #333;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .filters input:focus,
+    .filters select:focus {
+      outline: 2px solid #104E8B;
+      outline-offset: 1px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table.tableizer-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      border: 2px solid #c20000; 
+    }
+
+    .tableizer-table th,
+    .tableizer-table td {
+      padding: 4px 6px;
+      border: 1px solid #CCC;
+      vertical-align: top;
+    }
+
+    .tableizer-table th {
+      background-color: #c20000;
+      color: #FFF;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .tableizer-table tbody tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    .tableizer-table a {
+      color: #104E8B;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .tableizer-table a:hover {
+      text-decoration: underline;
+    }
+
+    .no-results {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #555;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .filters {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header class="page-header">
+      <img src="https://lively-begonia-ccf65e.netlify.app/images/logo-blanco-bta.png"
+           alt="Alcaldía Mayor de Bogotá">
+      <h1>PARAMETRIZACIÓN URLS VIRTUAL</h1>
+    </header>
+
+    <!-- FILTROS -->
+    <section class="filters">
+      <label>
+        <span>Buscar</span>
+        <input type="text" id="searchInput"
+               placeholder="Escribe nombre de la entidad o sector">
+      </label>
+
+      <label>
+        <span>Entidad</span>
+        <select id="filterEntidad">
+          <option value="">Todas las entidades</option>
+
+        </select>
+      </label>
+
+      <label>
+        <span>Sector</span>
+        <select id="filterSector">
+          <option value="">Todos los sectores</option>
+
+        </select>
+      </label>
+    </section>
+
+    <!-- TABLA -->
+    <div class="table-wrapper">
+      <table id="tablaEncuestas" class="tableizer-table">
+
+        <thead>
+          <tr class="tableizer-firstrow">
+            <th>entidad</th>
+            <th>sector</th>
+            <th>Link de encuesta</th>
+          </tr>
+        </thead>
+        <tbody>
+
+ <tr><td>Agencia Distrital para la Educación Superior, la Ciencia y la Tecnología - ATENEA</td><td>Educación</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=4&d[/data/mod1/gp1/p4]=2&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Caja de Vivienda Popular - CVP</td><td>Hábitat</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=9&d[/data/mod1/gp1/p4]=3&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Canal Capital</td><td>Cultura, Recreación y Deporte</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=2&d[/data/mod1/gp1/p4]=4&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Capital Salud EPS-S</td><td>Salud</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=17&d[/data/mod1/gp1/p4]=5&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Concejo de Bogotá</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=7&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Contraloría de Bogotá</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=9&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Departamento Administrativo de la Defensoría del Espacio Público - DADEP</td><td>Gobierno</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=7&d[/data/mod1/gp1/p4]=10&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Departamento Administrativo del Servicio Civil Distrital - DASCD</td><td>Gestión Pública</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=6&d[/data/mod1/gp1/p4]=11&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Empresa de Acueducto y Alcantarillado de Bogotá ESP</td><td>Hábitat</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=9&d[/data/mod1/gp1/p4]=14&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Empresa de Renovación y Desarrollo Urbano de Bogotá - Renobo</td><td>Hábitat</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=9&d[/data/mod1/gp1/p4]=15&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Empresa de Telecomunicaciones de Bogotá S.A. - ETB - ESP</td><td>Hábitat</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=9&d[/data/mod1/gp1/p4]=16&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Empresa de Transporte del Tercer Milenio Transmilenio S.A.</td><td>Movilidad</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=12&d[/data/mod1/gp1/p4]=17&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Prestaciones Económicas, Cesantías y Pensiones - FONCEP</td><td>Hacienda y Crédito Público</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=8&d[/data/mod1/gp1/p4]=18&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fundación Gilberto Alzate Avendaño - FUGA</td><td>Cultura, Recreación y Deporte</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=2&d[/data/mod1/gp1/p4]=20&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Instituto de Desarrollo Urbano - IDU</td><td>Movilidad</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=12&d[/data/mod1/gp1/p4]=22&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Instituto Distrital de Gestión de Riesgos y Cambio Climático - IDIGER</td><td>Ambiente</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=1&d[/data/mod1/gp1/p4]=23&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Instituto Distrital de la Participación y Acción Comunal - IDPAC</td><td>Gobierno</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=7&d[/data/mod1/gp1/p4]=24&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Instituto Distrital de las Artes - IDARTES</td><td>Cultura, Recreación y Deporte</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=2&d[/data/mod1/gp1/p4]=25&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Instituto Distrital de Patrimonio Cultural - IDPC</td><td>Cultura, Recreación y Deporte</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=2&d[/data/mod1/gp1/p4]=26&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Instituto Distrital de Protección y Bienestar Animal - IDPYBA</td><td>Ambiente</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=1&d[/data/mod1/gp1/p4]=27&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Instituto Distrital de Recreación y Deporte - IDRD</td><td>Cultura, Recreación y Deporte</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=2&d[/data/mod1/gp1/p4]=28&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Instituto Distrital de Turismo - IDT</td><td>Desarrollo Económico</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=3&d[/data/mod1/gp1/p4]=29&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Instituto Distrital para la Protección de la Niñez y la Juventud - IDIPRON</td><td>Integración Social</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=11&d[/data/mod1/gp1/p4]=30&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Instituto Para la Economía Social - IPES</td><td>Desarrollo Económico</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=3&d[/data/mod1/gp1/p4]=31&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Instituto para la Investigación Educativa y Desarrollo Pedagógico - IDEP</td><td>Educación</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=4&d[/data/mod1/gp1/p4]=32&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Jardín Botánico de Bogotá José Celestino Mutis - JBB</td><td>Ambiente</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=1&d[/data/mod1/gp1/p4]=33&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Lotería de Bogotá</td><td>Hacienda y Crédito Público</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=8&d[/data/mod1/gp1/p4]=34&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Orquesta Filarmónica de Bogotá - OFB</td><td>Cultura, Recreación y Deporte</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=2&d[/data/mod1/gp1/p4]=37&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Personería de Bogotá</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=38&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría de Cultura, Recreación y Deporte - SCRD</td><td>Cultura, Recreación y Deporte</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=2&d[/data/mod1/gp1/p4]=41&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría de Educación del Distrito - SED</td><td>Educación</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=4&d[/data/mod1/gp1/p4]=42&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría Distrital de Ambiente - SDA</td><td>Ambiente</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=1&d[/data/mod1/gp1/p4]=43&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría Distrital de Desarrollo Económico - SDDE</td><td>Desarrollo Económico</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=3&d[/data/mod1/gp1/p4]=44&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría Distrital de Gobierno - SDG</td><td>Gobierno</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=7&d[/data/mod1/gp1/p4]=45&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría Distrital de Hacienda - SDH</td><td>Hacienda y Crédito Público</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=8&d[/data/mod1/gp1/p4]=46&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría Distrital de Integración Social - SDIS</td><td>Integración Social</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=11&d[/data/mod1/gp1/p4]=47&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría Distrital de la Mujer</td><td>Mujer</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=13&d[/data/mod1/gp1/p4]=48&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría Distrital de Movilidad - SDM</td><td>Movilidad</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=12&d[/data/mod1/gp1/p4]=49&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría Distrital de Planeación - SDP</td><td>Planeación</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=15&d[/data/mod1/gp1/p4]=50&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría Distrital de Salud - SDS</td><td>Salud</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=17&d[/data/mod1/gp1/p4]=51&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría Distrital de Seguridad, Convivencia y Justicia - SDSCJ</td><td>Seguridad</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=18&d[/data/mod1/gp1/p4]=52&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría Distrital del Hábitat</td><td>Hábitat</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=9&d[/data/mod1/gp1/p4]=53&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría General Alcaldía Mayor de Bogotá</td><td>Gestión Pública</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=6&d[/data/mod1/gp1/p4]=54&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Secretaría Jurídica Distrital - SJD</td><td>Gestión Jurídica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=5&d[/data/mod1/gp1/p4]=55&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Subred Integrada de Servicios de Salud Centro Oriente E.S.E.</td><td>Salud</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=17&d[/data/mod1/gp1/p4]=57&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Subred Integrada de Servicios de Salud Norte E.S.E.</td><td>Salud</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=17&d[/data/mod1/gp1/p4]=58&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Subred Integrada de Servicios de Salud Sur E.S.E.</td><td>Salud</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=17&d[/data/mod1/gp1/p4]=59&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Subred Integrada de Servicios de Salud Sur Occidente E.S.E.</td><td>Salud</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=17&d[/data/mod1/gp1/p4]=60&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Terminal de Transportes S.A.</td><td>Movilidad</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=12&d[/data/mod1/gp1/p4]=62&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Unidad Administrativa Especial Cuerpo Oficial Bomberos Bogotá - UAECOBB</td><td>Seguridad</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=18&d[/data/mod1/gp1/p4]=63&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Unidad Administrativa Especial de Catastro Distrital - UAECD</td><td>Hacienda y Crédito Público</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=8&d[/data/mod1/gp1/p4]=64&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Unidad Administrativa Especial de Rehabilitación y Mantenimiento Vial - UAERMV</td><td>Movilidad</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=12&d[/data/mod1/gp1/p4]=66&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Unidad Administrativa Especial de Servicios Públicos - UAESP</td><td>Hábitat</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=9&d[/data/mod1/gp1/p4]=67&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Universidad Distrital Francisco José de Caldas - UDFJC</td><td>Educación</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=4&d[/data/mod1/gp1/p4]=70&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Veeduría Distrital</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=72&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Operadora Distrital de Transporte SAS</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=87&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Metro de Bogotá SA</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=88&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Instituto Distrital de Ciencia, Biotecnología e Innovación en Salud - IDCBIS</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=89&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Entidad de Gestión Administrativa y Técnica - EGAT</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=90&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Santa Fe - FDLSF</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=111&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Antonio Nariño</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=112&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Barrios Unidos</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=113&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Chapinero</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=114&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Ciudad Bolívar</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=115&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Engativá</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=116&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Fontibón</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=117&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Kennedy</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=118&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Los Mártires</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=119&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de San Cristóbal</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=120&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Suba</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=121&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Sumapaz</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=122&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Teusaquillo</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=123&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Tunjuelito</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=124&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Usaquén</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=125&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Usme</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=126&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local Rafael Uribe Uribe</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=127&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Bosa</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=128&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de Puente Aranda</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=129&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+ <tr><td>Fondo de Desarrollo Local de La Candelaria</td><td>No aplica</td><td>https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=6&d[/data/mod1/gp1/p3]=14&d[/data/mod1/gp1/p4]=130&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=</td></tr>
+              </tbody>
+      </table>
+    </div>
+
+    <p id="noResults" class="no-results">
+      No se encontraron resultados con los filtros actuales.
+    </p>
+  </div>
+
+  <script>
+document.addEventListener('DOMContentLoaded', function () {
+  const table = document.getElementById('tablaEncuestas');
+  if (!table) return;
+
+  const tbody  = table.tBodies[0];
+  const rows   = Array.from(tbody.rows);
+
+  const searchInput = document.getElementById('searchInput');
+  const entidadSel  = document.getElementById('filterEntidad');
+  const sectorSel   = document.getElementById('filterSector');
+  const noResults   = document.getElementById('noResults'); // opcional
+
+  const entidadesSet = new Set();
+  const sectoresSet  = new Set();
+
+  // Mapas jerárquicos
+  const entidadSectoresMap  = new Map(); // entidad -> Set(sectores)
+  const sectorEntidadesMap  = new Map(); // sector  -> Set(entidades)
+
+  // 🔹 Función para ignorar tildes y mayúsculas
+  function normalizar(str) {
+    return str
+      .normalize('NFD')                 // separa letras y tildes
+      .replace(/[\u0300-\u036f]/g, '')  // elimina las tildes
+      .toLowerCase();                   // pasa a minúsculas
+  }
+
+  // Recorremos filas: llenamos sets / mapas y convertimos URL a enlace
+  rows.forEach(row => {
+    const entidad = row.cells[0].textContent.trim();
+    const sector  = row.cells[1].textContent.trim();
+
+    entidadesSet.add(entidad);
+    sectoresSet.add(sector);
+
+    if (!entidadSectoresMap.has(entidad)) {
+      entidadSectoresMap.set(entidad, new Set());
+    }
+    entidadSectoresMap.get(entidad).add(sector);
+
+    if (!sectorEntidadesMap.has(sector)) {
+      sectorEntidadesMap.set(sector, new Set());
+    }
+    sectorEntidadesMap.get(sector).add(entidad);
+
+    // Columna 2: Link de encuesta -> <a>
+    const linkCell = row.cells[2];
+    const url = linkCell.textContent.trim();
+    if (url && !linkCell.querySelector('a')) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = 'Responder encuesta';
+      linkCell.textContent = '';
+      linkCell.appendChild(a);
+    }
+  });
+
+  const todasEntidades = Array.from(entidadesSet).sort((a, b) => a.localeCompare(b, 'es'));
+  const todosSectores  = Array.from(sectoresSet).sort((a, b) => a.localeCompare(b, 'es'));
+
+  // Helpers para rellenar selects
+  function rellenarEntidades(lista, seleccionPreferida) {
+    const anterior = entidadSel.value;
+    entidadSel.innerHTML = '';
+    const optAll = document.createElement('option');
+    optAll.value = '';
+    optAll.textContent = 'Todas las entidades';
+    entidadSel.appendChild(optAll);
+
+    lista.forEach(ent => {
+      const opt = document.createElement('option');
+      opt.value = ent;
+      opt.textContent = ent;
+      entidadSel.appendChild(opt);
+    });
+
+    const preferida = seleccionPreferida || anterior;
+    if (preferida && lista.includes(preferida)) {
+      entidadSel.value = preferida;
+    } else {
+      entidadSel.value = '';
+    }
+  }
+
+  function rellenarSectores(lista, seleccionPreferida) {
+    const anterior = sectorSel.value;
+    sectorSel.innerHTML = '';
+    const optAll = document.createElement('option');
+    optAll.value = '';
+    optAll.textContent = 'Todos los sectores';
+    sectorSel.appendChild(optAll);
+
+    lista.forEach(sec => {
+      const opt = document.createElement('option');
+      opt.value = sec;
+      opt.textContent = sec;
+      sectorSel.appendChild(opt);
+    });
+
+    const preferida = seleccionPreferida || anterior;
+    if (preferida && lista.includes(preferida)) {
+      sectorSel.value = preferida;
+    } else {
+      sectorSel.value = '';
+    }
+  }
+
+  // Carga inicial
+  rellenarEntidades(todasEntidades);
+  rellenarSectores(todosSectores);
+
+  // Aplicar filtros combinados
+  function aplicarFiltros() {
+    const texto  = normalizar(searchInput.value.trim());
+    const entSel = entidadSel.value;
+    const secSel = sectorSel.value;
+
+    let hayResultados = false;
+
+    rows.forEach(row => {
+      const entidad = row.cells[0].textContent.trim();
+      const sector  = row.cells[1].textContent.trim();
+
+      // 🔹 Texto de la fila normalizado (sin tildes)
+      const textoFila = normalizar(entidad + ' ' + sector);
+
+      const coincideEntidad = !entSel || entidad === entSel;
+      const coincideSector  = !secSel || sector  === secSel;
+      const coincideTexto   = !texto || textoFila.includes(texto);
+
+      if (coincideEntidad && coincideSector && coincideTexto) {
+        row.style.display = '';
+        hayResultados = true;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    if (noResults) {
+      noResults.style.display = hayResultados ? 'none' : 'block';
+    }
+  }
+
+  // ENTIDAD → restringe sectores
+  entidadSel.addEventListener('change', function () {
+    const entSelActual = entidadSel.value;
+    let sectoresValidos;
+
+    if (!entSelActual) {
+      sectoresValidos = todosSectores;
+    } else {
+      sectoresValidos = Array.from(entidadSectoresMap.get(entSelActual) || []);
+      sectoresValidos.sort((a, b) => a.localeCompare(b, 'es'));
+    }
+
+    rellenarSectores(sectoresValidos);
+    aplicarFiltros();
+  });
+
+  // SECTOR → restringe entidades
+  sectorSel.addEventListener('change', function () {
+    const secSelActual = sectorSel.value;
+    let entidadesValidas;
+
+    if (!secSelActual) {
+      entidadesValidas = todasEntidades;
+    } else {
+      entidadesValidas = Array.from(sectorEntidadesMap.get(secSelActual) || []);
+      entidadesValidas.sort((a, b) => a.localeCompare(b, 'es'));
+    }
+
+    rellenarEntidades(entidadesValidas);
+    aplicarFiltros();
+  });
+
+  // Buscador
+  searchInput.addEventListener('input', aplicarFiltros);
+});
+</script>
+
+</body>
+</html>

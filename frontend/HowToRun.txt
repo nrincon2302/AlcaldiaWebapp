@@ -1,0 +1,3 @@
+cd root_folder
+npm i
+npm run dev

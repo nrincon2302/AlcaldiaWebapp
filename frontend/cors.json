@@ -1,0 +1,11 @@
+[
+  {
+    "origin": [
+      "https://lively-begonia-ccf65e.netlify.app",
+      "http://localhost:5173"
+    ],
+    "method": ["GET", "HEAD"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]
