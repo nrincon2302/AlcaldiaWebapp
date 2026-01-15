@@ -1,10 +1,22 @@
 FROM python:3.11-slim
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
+
 WORKDIR /srv
-COPY requirements.txt /srv/requirements.txt
-RUN pip install --no-cache-dir -r /srv/requirements.txt
-COPY . /srv
-ENV PYTHONPATH=/srv
+
+RUN adduser --disabled-password appuser
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+RUN chown -R appuser:appuser /srv
+USER appuser
+
 ENV PORT=8080
-CMD ["bash","-lc","python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
+EXPOSE 8080
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD wget -qO- http://localhost:8080/health || exit 1
