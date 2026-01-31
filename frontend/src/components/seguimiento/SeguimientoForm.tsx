@@ -45,6 +45,10 @@ type UnifiedFormValue = {
   estado?: string | null; // "Borrador" | "Pendiente" | ...
   
   aprobado_evaluador?: "Aprobado" | "Rechazado" | "" | null;
+  
+
+  // Campo auxiliar para saber cuál es el estado del seguimiento en la BD antes de editar
+  _original_seguimiento?: string;
 };
 
 type Props = {
@@ -147,9 +151,9 @@ export default function SeguimientoForm({
 
   const canEditSeguimientoEstado = isAdmin || isAuditor;
 
-  const canEditPlanBlock = canEditCamposEntidad && isDraftEstado;
+  const canEditPlanBlock = canEditCamposEntidad && (isDraftEstado || isPlanDevueltoEvaluador);
   const canEditNombreEntidad = false;
-  const canEditEnlaceEntidad = canEditCamposEntidad && isDraftEstado;
+  const canEditEnlaceEntidad = canEditPlanBlock;
 
   const [eviUploading, setEviUploading] = React.useState(false);
   const [eviError, setEviError] = React.useState<string | null>(null);
@@ -437,7 +441,7 @@ export default function SeguimientoForm({
 
             <p className="mt-1 text-xs text-gray-500">
               {hasPlanPersisted
-                ? "El indicador de este plan ya está definido y no puede modificarse."
+                ? "El indicador de esta acción ya está definido y no puede modificarse."
                 : "Los indicadores que ya tienen un plan asociado aparecen deshabilitados para nuevos planes."}
             </p>
           </div>
@@ -548,14 +552,7 @@ export default function SeguimientoForm({
               aria-invalid={hasPlanError("accion_mejora_planteada")}
             />
 
-            {hasMultipleActions && (
-              <div className="mt-1 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-                <p className="font-semibold">Hemos detectado más de una posible acción.</p>
-                <p>
-                  Considera registrar cada acción como un plan separado antes de enviar.
-                </p>
-              </div>
-            )}
+
 
           </div>
         </div>
@@ -996,13 +993,20 @@ export default function SeguimientoForm({
                 className="w-full"
                 value={value.seguimiento ?? "Pendiente"}
                 onChange={(e) => onChange("seguimiento", e.target.value as any)}
-                disabled={!canEditSeguimientoEstado || !!ro["seguimiento"]}
+
+                disabled={!canEditSeguimientoEstado || !!ro["seguimiento"] || (value._original_seguimiento === "Finalizado" && !isAdmin)}
                 aria-disabled={!canEditSeguimientoEstado || !!ro["seguimiento"]}
               >
                 <option>Pendiente</option>
                 <option>En progreso</option>
                 <option>Finalizado</option>
               </select>
+            {/* Mensaje visual para entender por qué está bloqueado */}
+              {value.seguimiento === "Finalizado" && !isAdmin && (
+                <p className="mt-1 text-xs text-orange-600">
+                  Si este seguimiento es finalizado ya no se podrá editar.
+                </p>
+              )}
             </div>
           </div>
 
