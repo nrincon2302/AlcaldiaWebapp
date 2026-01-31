@@ -207,7 +207,7 @@ export default function SeguimientosTimeline({ items, activeId, onSelect }: Prop
   if (items.length === 0) {
     return (
       <div className="rounded-xl border bg-white p-4 text-center text-sm text-slate-500">
-        Aún no hay seguimientos en este plan.
+        Aún no hay seguimientos en esta acción.
       </div>
     );
   }
