@@ -1,8 +1,7 @@
 name: CD On-Prem
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
