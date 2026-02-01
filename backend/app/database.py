@@ -15,7 +15,6 @@ else:
         DATABASE_URL,
         poolclass=NullPool,          # <- clave para serverless + Neon Free
         pool_pre_ping=True,
-        connect_args={"sslmode": "require"},
     )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
