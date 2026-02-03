@@ -21,7 +21,8 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/plan_accion?sslmode=disable
+      DATABASE_URL: ${DATABASE_URL}
+      SEED_ON_START: true
       JWT_SECRET: supersecreto
       JWT_EXPIRE_HOURS: "8"
       CORS_ORIGINS: http://localhost
@@ -41,7 +42,9 @@ services:
       - "80:80"
     depends_on:
       backend:
-        condition: service_healthy
+        condition: service_started
+    environment:
+      - .env
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost"]
       interval: 30s

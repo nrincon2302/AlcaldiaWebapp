@@ -6,7 +6,7 @@ import PageBg from "../components/PageBackground";
 /**
  * Enlace de prueba (Shiny público). Puedes sustituirlo por tu URL oficial cuando la recibas.
  */
-const SHINY_URL = "https://modeloserviciociudadania.shinyapps.io/Dashboard-Shiny";
+const shinyUrl = import.meta.env.VITE_SHINY_URL ?? "https://modeloserviciociudadania.shinyapps.io/Dashboard-Shiny";;
 
 export default function Reportes() {
   return (
@@ -16,12 +16,12 @@ export default function Reportes() {
         <div className="card">
           <div className="mb-3 flex items-center justify-between">
             <h1 className="text-xl font-semibold">Reportes</h1>
-            <a href={SHINY_URL} target="_blank" rel="noreferrer" className="text-sm text-blue-600 underline">
+            <a href={shinyUrl} target="_blank" rel="noreferrer" className="text-sm text-blue-600 underline">
               Abrir en pestaña nueva
             </a>
           </div>
           <ResponsiveIframe
-            src={SHINY_URL}
+            src={shinyUrl}
             title="Shiny embebido"
             minHeight={760}
             allow="clipboard-write; fullscreen; download; allow-downloads"
