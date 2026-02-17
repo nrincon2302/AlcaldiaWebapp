@@ -73,9 +73,6 @@ export default function LoginPage() {
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
-        <div className="mt-3 text-xs text-gray-500">
-          Demo: cvp@mail.com - qwerty123 / profesionalddcs@demo.com  - ProfDDCS123 / admin@demo.com - admin123 
-        </div>
       </div>
     </div>
   );
