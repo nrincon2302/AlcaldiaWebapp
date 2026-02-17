@@ -7,7 +7,7 @@ services:
       SEED_ON_START: ${SEED_ON_START}
       JWT_SECRET: supersecreto
       JWT_EXPIRE_HOURS: "8"
-      CORS_ORIGINS: http://localhost
+      CORS_ORIGINS: ${{CORS_ORIGINS}}
     ports:
       - "8080:8080"
     healthcheck:
