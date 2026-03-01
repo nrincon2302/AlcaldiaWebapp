@@ -123,6 +123,10 @@ export default function SeguimientoPage() {
   const currentSeguimientoId = isSeguimientoActual ? currentAny?.id : undefined;
   const estadoPlanActual: string | null = (currentAny?.estado as string) ?? null; 
   
+  // <--- LÓGICA DE BLOQUEO --->
+  const estadoRealEnBD = (currentAny?._original_seguimiento || "").toLowerCase();
+  const isYaFinalizadoEnBD = estadoRealEnBD === "finalizado";
+
   const activePlan = React.useMemo(() => plans.find(p => p.id === activePlanId) ?? null, [plans, activePlanId]);
 
   const isPlanEnBorrador = !activePlan?.estado || activePlan?.estado === "Borrador";
@@ -135,26 +139,23 @@ export default function SeguimientoPage() {
   const isPlanAprobado = (currentAny?.aprobado_evaluador as string) === "Aprobado" || isPlanHabilitado; 
   const isSeguimientoVisible = Boolean(currentAny?.plan_id) && isPlanAprobado;
 
-  // Lógica de bloqueo global por "Finalizado"
   const existeSeguimientoFinalizado = React.useMemo(() => {
-    return children.some(child => child.seguimiento === "Finalizado");
+    return children.some(child => (child.seguimiento || "").toLowerCase() === "finalizado");
   }, [children]);
 
   const bloqueoGlobalPorFinalizado = existeSeguimientoFinalizado && !isAdmin;
 
-  // <--- 1. MODIFICACIÓN: Bloqueo si hay observación (aplica a Entidad Y Evaluador) --->
   const existeObservacionCalidad = !!(currentAny?.observacion_calidad || "").trim();
-  
-  // Bloqueo estricto para la entidad (no puede editar nada)
   const bloqueoTotalEntidad = isEntidad && existeObservacionCalidad;
-
-  // Bloqueo del selector de estado (aplica a ambos si ya se devolvió)
   const bloqueoSelectorEstado = existeObservacionCalidad;
 
   const entidadNoPuedeEnviar =
     (isEntidad && isSeguimientoActual && estadoSeguimientoActual !== "Pendiente") ||
     bloqueoGlobalPorFinalizado ||
     bloqueoTotalEntidad; 
+
+  // Bloqueo total para el botón de guardar
+  const formBloqueadoGuardar = entidadNoPuedeEnviar || isYaFinalizadoEnBD;
 
   const activeChild = children[pagerIndex] ?? null;
   const activeChildId = activeChild?.id;
@@ -339,19 +340,19 @@ export default function SeguimientoPage() {
               <SeguimientoForm
                 value={current as any}
                 onChange={updateLocal as any}
-                // <--- 2. APLICACIÓN DE LOS BLOQUEOS --->
                 readOnlyFields={{
-                  observacion_calidad: isEntidad || auditorYaEvaluoSeguimiento || bloqueoGlobalPorFinalizado,
-                  aprobado_evaluador: auditorYaEvaluoPlan || bloqueoGlobalPorFinalizado,
-                  plan_observacion_calidad: auditorYaEvaluoPlan || bloqueoGlobalPorFinalizado,
+                  // AQUÍ AGREGAMOS isYaFinalizadoEnBD a las observaciones y aprobación
+                  observacion_calidad: isEntidad || auditorYaEvaluoSeguimiento || bloqueoGlobalPorFinalizado || isYaFinalizadoEnBD,
+                  aprobado_evaluador: auditorYaEvaluoPlan || bloqueoGlobalPorFinalizado || isYaFinalizadoEnBD,
+                  plan_observacion_calidad: auditorYaEvaluoPlan || bloqueoGlobalPorFinalizado || isYaFinalizadoEnBD,
                   
-                  // La entidad no puede editar contenido si fue devuelto
+                  // Entidad bloqueada si hay observación
                   descripcion_actividades: bloqueoGlobalPorFinalizado || bloqueoTotalEntidad,
                   evidencia_cumplimiento: bloqueoGlobalPorFinalizado || bloqueoTotalEntidad,
                   fecha_reporte: bloqueoGlobalPorFinalizado || bloqueoTotalEntidad,
                   
-                  // NADIE puede cambiar el estado si ya tiene observación (se considera devuelto/histórico)
-                  seguimiento: bloqueoGlobalPorFinalizado || bloqueoSelectorEstado,
+                  // El estado se bloquea si el form ya se guardó previamente como 'Finalizado'
+                  seguimiento: bloqueoGlobalPorFinalizado || bloqueoSelectorEstado || isYaFinalizadoEnBD,
                 }}
                 focusRef={formFocusRef}
                 indicadoresApi={indicadoresApi}   
@@ -408,9 +409,10 @@ export default function SeguimientoPage() {
                     <button
                       type="button"
                       onClick={handleEnviar}
-                      disabled={!isDuplicableCurrent || sending || entidadNoPuedeEnviar}
+                      // BLOQUEO ABSOLUTO DE GUARDADO SI YA ESTÁ FINALIZADO
+                      disabled={!isDuplicableCurrent || sending || formBloqueadoGuardar}
                       className="inline-flex items-center gap-2 rounded-md bg-yellow-400 px-3 py-1.5 text-sm font-semibold text-black hover:bg-yellow-300 disabled:opacity-60 w-full sm:w-auto"
-                      title={entidadNoPuedeEnviar ? "No se puede modificar." : "Guardar y enviar"}
+                      title={formBloqueadoGuardar ? "No se puede modificar." : "Guardar y enviar"}
                     >
                       <FiSend /> {sending ? "Enviando..." : "Enviar"}
                     </button>
