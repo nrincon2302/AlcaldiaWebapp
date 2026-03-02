@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as XLSX from "xlsx";
 import { api } from "../lib/api";
 
@@ -22,9 +22,75 @@ export default function Dim6Uploader({ onProcessed }: Props) {
   const [invalidRows, setInvalidRows] = useState<any[]>([]);
   const [hasValidationIssues, setHasValidationIssues] = useState(false);
 
+  const [entidades, setEntidades] = useState<{ id_entidad: number; entidad: string }[]>([]);
+  const [anioDelete, setAnioDelete] = useState<number | "">("");
+  const [mesDelete, setMesDelete] = useState<number | "">("");
+  const [entidadDelete, setEntidadDelete] = useState<number | "">("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  const meses = [
+    { value: 1, label: "Enero" },
+    { value: 2, label: "Febrero" },
+    { value: 3, label: "Marzo" },
+    { value: 4, label: "Abril" },
+    { value: 5, label: "Mayo" },
+    { value: 6, label: "Junio" },
+    { value: 7, label: "Julio" },
+    { value: 8, label: "Agosto" },
+    { value: 9, label: "Septiembre" },
+    { value: 10, label: "Octubre" },
+    { value: 11, label: "Noviembre" },
+    { value: 12, label: "Diciembre" },
+  ];
+
   const clean = (s: string) => s.toLowerCase().replace(/[^a-z0-9_]/g, "");
+
+  useEffect(() => {
+    const loadEntidades = async () => {
+      try {
+        const res = await fetch("/external/Modelo_tabular.xlsx");
+        const buffer = await res.arrayBuffer();
+        const wb = XLSX.read(buffer);
+
+        const sheet = wb.Sheets["Entidades"];
+        if (!sheet) {
+          console.error("No existe hoja 'Entidades'");
+          return;
+        }
+
+        const data: any[] = XLSX.utils.sheet_to_json(sheet);
+
+        const clean = (s: string) =>
+          s?.toLowerCase().replace(/\s+/g, "").replace(/[^a-z0-9]/g, "");
+
+        const parsed = data.map((row) => {
+          const normalized: any = {};
+
+          Object.keys(row).forEach((key) => {
+            normalized[clean(key)] = row[key];
+          });
+
+          return {
+            id_entidad: Number(normalized["identidad"]),
+            entidad: normalized["entidad"],
+          };
+        });
+
+        const filtered = parsed.filter(
+          (e) => !isNaN(e.id_entidad) && e.entidad
+        );
+
+        setEntidades(filtered);
+
+      } catch (err) {
+        console.error("Error cargando entidades:", err);
+      }
+    };
+
+    loadEntidades();
+  }, []);
 
   // -----------------------------
   // LECTURA
@@ -160,15 +226,29 @@ export default function Dim6Uploader({ onProcessed }: Props) {
   };
 
   // esta función realiza la eliminación real (se ejecuta al confirmar)
-  const vaciarBaseDatos = async () => {
+  const eliminarPorCondicion = async () => {
     try {
-      const res = await api.del("/habilidades");
-      setEmptyDatabase(true);
-      setShowConfirmEmpty(false);
-      alert("Base de datos vaciada. Ahora puede cargar un nuevo archivo.");
+      const params = new URLSearchParams();
+
+      if (anioDelete) params.append("anio", String(anioDelete));
+      if (mesDelete) params.append("mes", String(mesDelete));
+      if (entidadDelete) params.append("id_entidad", String(entidadDelete));
+
+      if (![anioDelete, mesDelete, entidadDelete].some(Boolean)) {
+        alert("Debe seleccionar al menos un filtro.");
+        return;
+      }
+
+      await api.del(`/habilidades/condicion?${params.toString()}`);
+
+      alert("Registros eliminados correctamente.");
+      setShowDeleteConfirm(false);
+      setAnioDelete("");
+      setMesDelete("");
+      setEntidadDelete("");
+
     } catch (err: any) {
-      setShowConfirmEmpty(false);
-      alert("Error al vaciar la base de datos: " + err.message);
+      alert("Error eliminando: " + err.message);
     }
   };
 
@@ -285,75 +365,145 @@ export default function Dim6Uploader({ onProcessed }: Props) {
         <strong>Nota:</strong> El archivo cargado complementará los datos
         existentes en la base de datos para las habilidades reportadas.
         <br />
-        Si desea comenzar desde cero, puede vaciar la base de datos antes de
-        cargar un nuevo archivo.
+        También puede eliminar registros a continuación:
       </div>
-      <button
-        onClick={requestVaciarBaseDatos}
-        style={{
-          marginTop: 10,
-          padding: "8px",
-          background: "#D32D37",
-          color: "white",
-          borderRadius: 4,
-          cursor: "pointer",
-        }}
-      >
-        Vaciar base de datos de habilidades
-      </button>
 
-      {/* Banner de confirmación */}
-      {showConfirmEmpty && (
-        <div
+<div
+  style={{
+    marginTop: 25,
+    padding: 20,
+    borderRadius: 8,
+    background: "#fafafa",
+    border: "1px solid #e0e0e0",
+  }}
+>
+  <h4 style={{ marginBottom: 15 }}>
+    Eliminar registros
+  </h4>
+
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: 10,
+      marginBottom: 12,
+    }}
+  >
+    <input
+      type="number"
+      placeholder="Año"
+      value={anioDelete}
+      onChange={(e) =>
+        setAnioDelete(e.target.value ? Number(e.target.value) : "")
+      }
+      style={{ padding: 6 }}
+    />
+
+    <select
+      value={mesDelete}
+      onChange={(e) =>
+        setMesDelete(e.target.value ? Number(e.target.value) : "")
+      }
+      style={{ padding: 6 }}
+    >
+      <option value="">Mes</option>
+      {meses.map((m) => (
+        <option key={m.value} value={m.value}>
+          {m.label}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  <select
+    value={entidadDelete}
+    onChange={(e) =>
+      setEntidadDelete(e.target.value ? Number(e.target.value) : "")
+    }
+    style={{
+      width: "100%",
+      padding: 6,
+      marginBottom: 15,
+    }}
+  >
+    <option value="">Seleccionar entidad (opcional)</option>
+    {entidades.map((e) => (
+      <option key={e.id_entidad} value={e.id_entidad}>
+        {e.entidad}
+      </option>
+    ))}
+  </select>
+
+  <button
+    disabled={
+      !anioDelete && !mesDelete && !entidadDelete
+    }
+    onClick={() => setShowDeleteConfirm(true)}
+    style={{
+      width: "100%",
+      padding: 8,
+      background:
+        !anioDelete && !mesDelete && !entidadDelete
+          ? "#ccc"
+          : "#D32D37",
+      color: "white",
+      borderRadius: 6,
+      border: "none",
+      cursor:
+        !anioDelete && !mesDelete && !entidadDelete
+          ? "not-allowed"
+          : "pointer",
+      fontSize: 14,
+    }}
+  >
+    Eliminar según filtros
+  </button>
+
+  {showDeleteConfirm && (
+    <div
+      style={{
+        marginTop: 12,
+        padding: 12,
+        background: "#fff4f4",
+        border: "1px solid #f5c2c2",
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ marginBottom: 10 }}>
+        ¿Confirmar eliminación con los filtros seleccionados?
+      </div>
+
+      <div style={{ display: "flex", gap: 10 }}>
+        <button
+          onClick={eliminarPorCondicion}
           style={{
-            marginTop: 10,
-            padding: 12,
+            flex: 1,
+            padding: 8,
+            background: "#D32D37",
+            color: "white",
             borderRadius: 6,
-            backgroundColor: "#fff4f4",
-            border: "1px solid #f5c2c2",
-            display: "flex",
-            flexDirection: "column",
-            gap: 8,
+            border: "none",
           }}
         >
-          <div style={{ color: "#D32D37", fontWeight: "bold" }}>
-            ¿Está seguro que desea vaciar la base de datos de habilidades?
-          </div>
-          <div style={{ fontSize: 13, color: "#333" }}>
-            Esta acción eliminará todos los registros y no se podrá deshacer.
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              onClick={vaciarBaseDatos}
-              style={{
-                flex: 1,
-                padding: 8,
-                background: "#D32D37",
-                color: "white",
-                borderRadius: 4,
-                cursor: "pointer",
-                border: "none",
-              }}
-            >
-              Confirmar eliminación
-            </button>
-            <button
-              onClick={cancelarVaciar}
-              style={{
-                flex: 1,
-                padding: 8,
-                background: "#eee",
-                color: "#333",
-                borderRadius: 4,
-                cursor: "pointer",
-                border: "1px solid #ccc",
-              }}
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      )}
+          Confirmar
+        </button>
+
+        <button
+          onClick={() => setShowDeleteConfirm(false)}
+          style={{
+            flex: 1,
+            padding: 8,
+            background: "#eee",
+            borderRadius: 6,
+            border: "1px solid #ccc",
+          }}
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  )}
+</div>
     </div>
   );
 }

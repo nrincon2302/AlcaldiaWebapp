@@ -45,22 +45,47 @@ def cargar_habilidades(
     return {"insertados": len(nuevos)}
 
 
-@router.delete("/{habilidad_id}")
-@router.delete("/{habilidad_id}/")
+@router.delete("/condicion")
+@router.delete("/condicion/")
 def eliminar_habilidad(
-    habilidad_id: int,
+    anio: Optional[int] = Query(None),
+    mes: Optional[int] = Query(None),
+    id_entidad: Optional[int] = Query(None),
     db: Session = Depends(get_db),
     user: models.User = Depends(get_current_user),
 ):
-    habilidad = db.query(models.Habilidad).filter(models.Habilidad.id == habilidad_id).first()
-    
-    if not habilidad:
-        raise HTTPException(status_code=404, detail="Habilidad no encontrada")
+    query = db.query(models.Habilidad)
 
-    db.delete(habilidad)
+    filtros_aplicados = False
+
+    if anio is not None:
+        query = query.filter(models.Habilidad.anio == anio)
+        filtros_aplicados = True
+
+    if mes is not None:
+        query = query.filter(models.Habilidad.mes == mes)
+        filtros_aplicados = True
+
+    if id_entidad is not None:
+        query = query.filter(models.Habilidad.id_entidad == id_entidad)
+        filtros_aplicados = True
+
+    if not filtros_aplicados:
+        raise HTTPException(
+            status_code=400,
+            detail="Debe enviar al menos un parámetro de filtro"
+        )
+
+    deleted = query.delete(synchronize_session=False)
     db.commit()
-    
-    return {"message": "Habilidad eliminada exitosamente"}
+
+    if deleted == 0:
+        raise HTTPException(
+            status_code=404,
+            detail="No se encontraron registros con esas condiciones"
+        )
+
+    return {"message": f"{deleted} registros eliminados"}
 
 
 @router.delete("")
