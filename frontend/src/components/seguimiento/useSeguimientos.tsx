@@ -125,8 +125,6 @@ function buildPlanPayload(base: UnifiedForm) {
     observacion_calidad: toNull(base.plan_observacion_calidad),
     aprobado_evaluador: toNull((base as any).aprobado_evaluador as any),
     estado: base.estado ?? "Borrador",
-    
-    // Aseguramos que el estado del seguimiento se guarde en el Plan padre
     seguimiento: base.seguimiento ?? "Pendiente",
   };
 }
@@ -295,8 +293,6 @@ export function useSeguimientos() {
         ? plan.seguimientos
         : await api(`/seguimiento/${plan.id}/seguimiento`);
     
-    // CORRECCIÓN VITAL: Ordenamos por ID descendente para obtener el MÁS NUEVO primero.
-    // Esto asegura que 'latest' sea realmente el último seguimiento creado.
     const sortedSegs = [...segs].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
 
     const safeSegs: Seguimiento[] = segs.length
@@ -307,13 +303,11 @@ export function useSeguimientos() {
         }))
       : [];
 
-    setChildren(safeSegs); // Mantenemos el orden original para el timeline (generalmente ascendente)
+    setChildren(safeSegs); 
 
-    // Usamos 'sortedSegs[0]' que es el más nuevo para determinar el estado actual
     const latest = sortedSegs[0];
     const realStatus = latest?.seguimiento ?? plan.seguimiento ?? "Pendiente";
 
-    // Actualizamos el plan en la lista con el estado CALCULADO
     setPlans((prev) => prev.map((p) => (p.id === plan!.id ? { ...plan!, seguimiento: realStatus } : p)));
 
     const savedByEntidad =
@@ -323,7 +317,7 @@ export function useSeguimientos() {
       !!(latest.descripcion_actividades || "").trim();
 
     setForm({
-      ...(latest ?? emptyForm()), // Cargamos en el formulario el MÁS NUEVO
+      ...(latest ?? emptyForm()), 
       plan_id: plan.id,
       nombre_entidad: plan.nombre_entidad,
       enlace_entidad: plan.enlace_entidad ?? "",
@@ -424,15 +418,18 @@ export function useSeguimientos() {
     const base = overrides ? { ...form, ...overrides } : form;
     setPlanMissingKeys([]);
     if (!base.nombre_entidad?.trim()) throw new Error("Ingresa el nombre de la entidad");
+    
     const prevEstado = form.estado ?? "Borrador";
     const shouldValidatePlan = prevEstado === "Borrador" || !form.plan_id;
     const missingPlanFields = collectPlanFieldGaps(base, shouldValidatePlan);
+    
     if (missingPlanFields.length) {
       setPlanMissingKeys(missingPlanFields);
       const labels = missingPlanFields.map((k) => planFieldLabels[k] || k);
       alert(`Todos los campos son requeridos: ${labels.join(", ")} `);
       return null;
     }
+    
     const planId = await ensurePlanExists();
     const planPayload = buildPlanPayload(base);
 
@@ -442,49 +439,6 @@ export function useSeguimientos() {
       } catch (e) { console.error("useSeguimientos: no se pudo actualizar el plan", e); }
     }
     const nextEstado = (overrides && "estado" in overrides ? overrides.estado : form.estado) ?? null;
-
-    if (!base.id) {
-      const v = (base.indicador || "").trim();
-      if (v) setUsedIndicadores((prev) => prev.includes(v) ? prev : [...prev, v]);
-
-      setForm((prev) => ({
-        ...prev,
-        plan_id: planId,
-        estado: nextEstado ?? prev.estado ?? null,
-        observacion_informe_calidad: base.observacion_informe_calidad ?? prev.observacion_informe_calidad ?? "",
-        aprobado_evaluador: (base as any).aprobado_evaluador ?? prev.aprobado_evaluador ?? null,
-        plan_observacion_calidad: base.plan_observacion_calidad ?? prev.plan_observacion_calidad ?? null,
-        
-        _original_seguimiento: base.seguimiento ?? prev.seguimiento ?? "Pendiente",
-      }));
-      setPlanMissingKeys([]);
-
-      setPlans((prev) =>
-        prev.map((p) =>
-          p.id === planId
-            ? {
-                ...p,
-                enlace_entidad: base.enlace_entidad ?? p.enlace_entidad,
-                estado: nextEstado ?? p.estado ?? null,
-                fecha_inicio: base.fecha_inicio ?? p.fecha_inicio ?? null,
-                fecha_final: base.fecha_final ?? p.fecha_final ?? null,
-                tipo_accion_mejora: base.tipo_accion_mejora ?? p.tipo_accion_mejora ?? null,
-                accion_mejora_planteada: base.accion_mejora_planteada ?? p.accion_mejora_planteada ?? null,
-                plan_descripcion_actividades: base.plan_descripcion_actividades ?? p.plan_descripcion_actividades ?? null,
-                plan_evidencia_cumplimiento: base.plan_evidencia_cumplimiento ?? p.plan_evidencia_cumplimiento ?? null,
-                indicador: base.indicador ?? p.indicador ?? null,
-                criterio: base.criterio ?? p.criterio ?? null,
-                observacion_informe_calidad: base.observacion_informe_calidad ?? p.observacion_informe_calidad ?? null,
-                aprobado_evaluador: (base as any).aprobado_evaluador ?? (p as any).aprobado_evaluador ?? null,
-                observacion_calidad: base.plan_observacion_calidad ?? (p as any).observacion_calidad ?? null,
-                
-                seguimiento: base.seguimiento ?? p.seguimiento
-              }
-            : p
-        )
-      );
-      return { plan_id: planId } as any;
-    }
 
     const childPayload: Seguimiento = {
       ajuste_de_id: base.ajuste_de_id ?? null,
@@ -507,15 +461,28 @@ export function useSeguimientos() {
     const planActionFallback = toNull(base.accion_mejora_planteada) ?? plans.find((p) => p.id === planId)?.accion_mejora_planteada ?? null;
     let saved: Seguimiento;
 
-    const updated = await api(`/seguimiento/${planId}/seguimiento/${base.id}`, { method: "PUT", body: JSON.stringify(childPayload) });
-    const withActor: Seguimiento = {
-      ...updated,
-      updated_by_email: actorEmail,
-      entidad: base.entidad ?? base.nombre_entidad ?? null,
-      accion_mejora_planteada: updated.accion_mejora_planteada ?? planActionFallback ?? null,
-    };
-    setChildren((prev) => prev.map((x) => (x.id === updated.id ? withActor : x)));
-    saved = withActor;
+    // === AQUÍ ESTÁ LA CORRECCIÓN DE LA MAGIA ===
+    // Si no hay ID, creamos el seguimiento en lugar de solo regresar.
+    if (!base.id) {
+      const createdChild = await api(`/seguimiento/${planId}/seguimiento`, { method: "POST", body: JSON.stringify(childPayload) });
+      saved = {
+        ...createdChild,
+        updated_by_email: actorEmail,
+        entidad: base.entidad ?? base.nombre_entidad ?? null,
+        accion_mejora_planteada: createdChild.accion_mejora_planteada ?? planActionFallback ?? null,
+      };
+      setChildren((prev) => [...prev, saved]);
+    } else {
+      // Si ya hay ID, lo actualizamos normalmente
+      const updated = await api(`/seguimiento/${planId}/seguimiento/${base.id}`, { method: "PUT", body: JSON.stringify(childPayload) });
+      saved = {
+        ...updated,
+        updated_by_email: actorEmail,
+        entidad: base.entidad ?? base.nombre_entidad ?? null,
+        accion_mejora_planteada: updated.accion_mejora_planteada ?? planActionFallback ?? null,
+      };
+      setChildren((prev) => prev.map((x) => (x.id === updated.id ? saved : x)));
+    }
 
     if (childPayload.indicador) {
       const v = (childPayload.indicador || "").trim();
@@ -537,6 +504,7 @@ export function useSeguimientos() {
       _saved_by_entidad: prev._saved_by_entidad || (isEntidad && !!actorEmailLower && ((saved as any).updated_by_email || "").toString().trim().toLowerCase() === actorEmailLower && !!(saved.descripcion_actividades || base.descripcion_actividades || "").trim()),
       _original_seguimiento: base.seguimiento ?? prev.seguimiento ?? "Pendiente",
     }));
+    
     setPlanMissingKeys([]);
 
     setPlans((prev) =>
@@ -557,7 +525,6 @@ export function useSeguimientos() {
               observacion_informe_calidad: base.observacion_informe_calidad ?? p.observacion_informe_calidad ?? null,
               aprobado_evaluador: (base as any).aprobado_evaluador ?? (p as any).aprobado_evaluador ?? null,
               observacion_calidad: base.plan_observacion_calidad ?? (p as any).observacion_calidad ?? null,
-              
               seguimiento: base.seguimiento || p.seguimiento || "Pendiente"
             }
           : p
