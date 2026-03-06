@@ -1,7 +1,6 @@
 server {
     listen 80;
     server_name _;
-    # Redirige todo el tráfico HTTP a HTTPS
     return 301 https://$host$request_uri;
 }
 
@@ -16,45 +15,36 @@ server {
     ssl_ciphers         HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;
 
-    # ── Ocultar versión nginx (LOW: HTTP Header Information Disclosure) ──
+    # LOW: HTTP Header Information Disclosure
     server_tokens off;
 
     root  /usr/share/nginx/html;
     index index.html;
 
     # ── Security Headers ─────────────────────────────────────
-    # LOW: Missing X-Frame-Options
     add_header X-Frame-Options "DENY" always;
-
-    # LOW: Missing X-Content-Type-Options
     add_header X-Content-Type-Options "nosniff" always;
-
-    # LOW: Missing Content Security Policy
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://modeloserviciociudadania.shinyapps.io https://*.run.app; frame-src https://modeloserviciociudadania.shinyapps.io; base-uri 'self'; form-action 'self';" always;
-
-    # LOW: Missing Permissions Policy
     add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
-
-    # LOW: Missing Referrer Policy
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-
-    # HIGH: HTTPS Not Detected → HSTS fuerza HTTPS en futuros accesos
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
-    # ── Cache-Control (LOW: Missing Cache-Control Header) ────
-    # HTML: nunca almacenar en caché
+    # LOW: Missing Content Security Policy
+    # connect-src: 'self' cubre las llamadas al backend (van por el proxy nginx en el mismo origen)
+    # frame-src: permite embeber el servidor Shiny
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; connect-src 'self' http://${SHINY_HOST}; frame-src http://${SHINY_HOST}; base-uri 'self'; form-action 'self';" always;
+
+    # ── Cache-Control ─────────────────────────────────────────
     location ~* \.html?$ {
         add_header Cache-Control "no-store, no-cache, must-revalidate" always;
         add_header X-Frame-Options "DENY" always;
         add_header X-Content-Type-Options "nosniff" always;
-        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://modeloserviciociudadania.shinyapps.io https://*.run.app; frame-src https://modeloserviciociudadania.shinyapps.io; base-uri 'self'; form-action 'self';" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; connect-src 'self' http://${SHINY_HOST}; frame-src http://${SHINY_HOST}; base-uri 'self'; form-action 'self';" always;
         add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
         try_files $uri $uri/ /index.html;
     }
 
-    # Assets estáticos con hash en el nombre: cache larga
     location ~* \.(js|css|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|ico|webp)$ {
         add_header Cache-Control "public, max-age=31536000, immutable" always;
         add_header X-Content-Type-Options "nosniff" always;
@@ -62,16 +52,17 @@ server {
         try_files $uri =404;
     }
 
-    # ── security.txt (LOW: Security.txt File Not Detected) ──
+    # LOW: Security.txt
     location = /.well-known/security.txt {
         add_header Cache-Control "no-store" always;
         try_files $uri =404;
     }
 
-    # ── Reverse proxy → backend (puerto 8080) ───────────────
-    # El backend queda en red interna; no se expone directamente al exterior
+    # ── Reverse proxy → backend ──────────────────────────────
+    # El backend escucha en ${BACKEND_HOST} pero SOLO es accesible
+    # desde la red interna de Docker; no está expuesto al exterior.
     location /auth/ {
-        proxy_pass         http://backend:8080/auth/;
+        proxy_pass         http://${BACKEND_HOST}/auth/;
         proxy_set_header   Host              $host;
         proxy_set_header   X-Real-IP         $remote_addr;
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -79,7 +70,7 @@ server {
     }
 
     location /users/ {
-        proxy_pass         http://backend:8080/users/;
+        proxy_pass         http://${BACKEND_HOST}/users/;
         proxy_set_header   Host              $host;
         proxy_set_header   X-Real-IP         $remote_addr;
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -87,7 +78,7 @@ server {
     }
 
     location /seguimiento/ {
-        proxy_pass         http://backend:8080/seguimiento/;
+        proxy_pass         http://${BACKEND_HOST}/seguimiento/;
         proxy_set_header   Host              $host;
         proxy_set_header   X-Real-IP         $remote_addr;
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -95,7 +86,7 @@ server {
     }
 
     location /reports/ {
-        proxy_pass         http://backend:8080/reports/;
+        proxy_pass         http://${BACKEND_HOST}/reports/;
         proxy_set_header   Host              $host;
         proxy_set_header   X-Real-IP         $remote_addr;
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -103,7 +94,7 @@ server {
     }
 
     location /pqrds/ {
-        proxy_pass         http://backend:8080/pqrds/;
+        proxy_pass         http://${BACKEND_HOST}/pqrds/;
         proxy_set_header   Host              $host;
         proxy_set_header   X-Real-IP         $remote_addr;
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -111,7 +102,7 @@ server {
     }
 
     location /habilidades/ {
-        proxy_pass         http://backend:8080/habilidades/;
+        proxy_pass         http://${BACKEND_HOST}/habilidades/;
         proxy_set_header   Host              $host;
         proxy_set_header   X-Real-IP         $remote_addr;
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -119,7 +110,7 @@ server {
     }
 
     location /files/ {
-        proxy_pass         http://backend:8080/files/;
+        proxy_pass         http://${BACKEND_HOST}/files/;
         proxy_set_header   Host              $host;
         proxy_set_header   X-Real-IP         $remote_addr;
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -128,7 +119,7 @@ server {
     }
 
     location /uploads/ {
-        proxy_pass         http://backend:8080/uploads/;
+        proxy_pass         http://${BACKEND_HOST}/uploads/;
         proxy_set_header   Host              $host;
         proxy_set_header   X-Real-IP         $remote_addr;
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -136,7 +127,7 @@ server {
     }
 
     location = /healthz {
-        proxy_pass         http://backend:8080/healthz;
+        proxy_pass         http://${BACKEND_HOST}/healthz;
         proxy_set_header   Host              $host;
         proxy_set_header   X-Real-IP         $remote_addr;
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;

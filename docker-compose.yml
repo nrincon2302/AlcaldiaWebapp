@@ -7,28 +7,32 @@ services:
       SEED_ON_START: ${SEED_ON_START}
       JWT_SECRET: supersecreto
       JWT_EXPIRE_HOURS: "8"
-      # Incluir el origen HTTPS para que CORS acepte peticiones del frontend
       CORS_ORIGINS: ${CORS_ORIGINS}
-    # Puerto 8080 NO se expone al host: solo accesible desde la red interna de Docker
-    # ports:
-    #   - "8080:8080"
+    ports:
+      - "8080:8080"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3
+    networks:
+      - frontend_net
 
   frontend:
     build:
       context: ./frontend
       args:
-        # La API ahora se sirve a través del proxy nginx en HTTPS
-        VITE_API_URL: https://10.110.33.36
-        SERVER_IP: "10.110.33.36"
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_SHINY_URL: ${VITE_SHINY_URL}
+        SERVER_IP: ${SERVER_IP}
     container_name: plan-accion-frontend
+    environment:
+      SERVER_IP: ${SERVER_IP}
+      SHINY_HOST: ${SHINY_HOST}
+      BACKEND_HOST: ${BACKEND_HOST}
     ports:
-      - "80:80"    # redirige a HTTPS
-      - "443:443"  # HTTPS principal
+      - "80:80"
+      - "443:443"
     depends_on:
       backend:
         condition: service_started
@@ -37,7 +41,9 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    networks:
+      - frontend_net
 
-volumes:
-  pgdata:
-    driver: local
+networks:
+  frontend_net:
+    driver: bridge
