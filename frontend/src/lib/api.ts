@@ -89,18 +89,21 @@ async function doFetch(url: string, init?: RequestInit) {
 }
 
 function buildUrl(path: string): string {
-  if (!BASE) throw new Error("Falta VITE_API_URL");
-
   let raw = String(path || "").trim();
   if (!raw.startsWith("/")) raw = "/" + raw;
 
-  // separa path y querystring
   const [pathname0, search = ""] = raw.split("?");
-  let pathname = pathname0.replace(/\/{2,}/g, "/"); // colapsa // -> /
+  let pathname = pathname0.replace(/\/{2,}/g, "/");
 
-  // SOLO para endpoints de seguimiento, forzar slash final (evita redirects que rompen CORS)
-  if (pathname.startsWith("/seguimiento") && !pathname.endsWith("/")) {
+  // El backend ya registra las rutas con y sin slash (ej: @router.get("") + @router.get("/")).
+  if (!pathname.endsWith("/")) {
     pathname += "/";
+  }
+
+  // Sin VITE_API_URL → URLs relativas; nginx las proxea al backend.
+  // Con VITE_API_URL → URLs absolutas (útil para llamadas fuera del proxy).
+  if (!BASE) {
+    return `${pathname}${search ? "?" + search : ""}`;
   }
 
   return `${BASE}${pathname}${search ? "?" + search : ""}`;

@@ -31,14 +31,14 @@ server {
     # LOW: Missing Content Security Policy
     # connect-src: 'self' cubre las llamadas al backend (van por el proxy nginx en el mismo origen)
     # frame-src: permite embeber el servidor Shiny
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; connect-src 'self' http://${SHINY_HOST}; frame-src http://${SHINY_HOST}; base-uri 'self'; form-action 'self';" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; connect-src 'self' https://${SHINY_HOST}; frame-src https://${SHINY_HOST}; base-uri 'self'; form-action 'self';" always;
 
     # ── Cache-Control ─────────────────────────────────────────
     location ~* \.html?$ {
         add_header Cache-Control "no-store, no-cache, must-revalidate" always;
         add_header X-Frame-Options "DENY" always;
         add_header X-Content-Type-Options "nosniff" always;
-        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; connect-src 'self' http://${SHINY_HOST}; frame-src http://${SHINY_HOST}; base-uri 'self'; form-action 'self';" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; connect-src 'self' https://${SHINY_HOST}; frame-src https://${SHINY_HOST}; base-uri 'self'; form-action 'self';" always;
         add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
