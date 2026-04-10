@@ -1,7 +1,10 @@
 server {
     listen 80;
     server_name _;
-    return 301 https://$host$request_uri;
+    # LOW: HTTP Header Information Disclosure - ocultar versión también en bloque HTTP
+    server_tokens off;
+    # MEDIUM: Host Header Injection - usar IP fija en lugar de $host (que refleja el header inyectado)
+    return 301 https://${SERVER_IP}$request_uri;
 }
 
 server {
@@ -12,7 +15,10 @@ server {
     ssl_certificate     /etc/nginx/ssl/cert.pem;
     ssl_certificate_key /etc/nginx/ssl/key.pem;
     ssl_protocols       TLSv1.2 TLSv1.3;
-    ssl_ciphers         HIGH:!aNULL:!MD5;
+    # MEDIUM: SSL Forward Secrecy + LOW: Weak Ciphers
+    # Solo suites ECDHE (garantizan forward secrecy) y GCM/POLY1305 (eliminan CBC débiles).
+    # Se eliminan todas las suites RSA key-exchange (TLS_RSA_WITH_*).
+    ssl_ciphers         ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256;
     ssl_prefer_server_ciphers on;
 
     # LOW: HTTP Header Information Disclosure
@@ -21,6 +27,9 @@ server {
     root  /usr/share/nginx/html;
     index index.html;
 
+    # LOW: CSP Missing 'Report-To' - definir endpoint de reporte (Reporting API v1)
+    add_header Reporting-Endpoints "default=\"https://${SERVER_IP}/csp-report\"" always;
+
     # ── Security Headers ─────────────────────────────────────
     add_header X-Frame-Options "DENY" always;
     add_header X-Content-Type-Options "nosniff" always;
@@ -28,17 +37,18 @@ server {
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
-    # LOW: Missing Content Security Policy
-    # connect-src: 'self' cubre las llamadas al backend (van por el proxy nginx en el mismo origen)
-    # frame-src: permite embeber el servidor Shiny
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; connect-src 'self' https://${SHINY_HOST}; frame-src https://${SHINY_HOST}; base-uri 'self'; form-action 'self';" always;
+    # LOW: Permissive CSP - se agrega object-src 'none' (faltaba) y report-to default
+    # Nota: unsafe-inline en style-src se mantiene porque React/CSS-in-JS lo requiere;
+    # eliminarlo requeriría refactorizar el frontend para usar nonces o hashes.
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; object-src 'none'; connect-src 'self' https://${SHINY_HOST}; frame-src https://${SHINY_HOST}; base-uri 'self'; form-action 'self'; report-to default;" always;
 
     # ── Cache-Control ─────────────────────────────────────────
     location ~* \.html?$ {
         add_header Cache-Control "no-store, no-cache, must-revalidate" always;
         add_header X-Frame-Options "DENY" always;
         add_header X-Content-Type-Options "nosniff" always;
-        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; connect-src 'self' https://${SHINY_HOST}; frame-src https://${SHINY_HOST}; base-uri 'self'; form-action 'self';" always;
+        add_header Reporting-Endpoints "default=\"https://${SERVER_IP}/csp-report\"" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; object-src 'none'; connect-src 'self' https://${SHINY_HOST}; frame-src https://${SHINY_HOST}; base-uri 'self'; form-action 'self'; report-to default;" always;
         add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
@@ -58,9 +68,14 @@ server {
         try_files $uri =404;
     }
 
+    # LOW: CSP Missing 'Report-To' - endpoint interno que descarta las violaciones (204 No Content)
+    # Si en el futuro se quiere persistir los reportes, este location puede proxy_pass a un servicio.
+    location = /csp-report {
+        access_log off;
+        return 204;
+    }
+
     # ── Reverse proxy → backend ──────────────────────────────
-    # El backend escucha en ${BACKEND_HOST} pero SOLO es accesible
-    # desde la red interna de Docker; no está expuesto al exterior.
     location /auth/ {
         proxy_pass         http://${BACKEND_HOST}/auth/;
         proxy_set_header   Host              $host;
