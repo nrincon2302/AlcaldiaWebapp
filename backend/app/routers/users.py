@@ -10,6 +10,7 @@ from passlib.hash import bcrypt  # si ya usas otra, cámbiala
 
 router = APIRouter(prefix="/users", tags=["users"])
 
+@router.patch("/{user_id}/password/", status_code=204)
 @router.patch("/{user_id}/password", status_code=204)
 def reset_password(
     user_id: int,
@@ -28,6 +29,7 @@ def reset_password(
     db.commit()
     return Response(status_code=204)
 
+@router.delete("/{user_id}/", status_code=204)
 @router.delete("/{user_id}", status_code=204)
 def delete_user(user_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     require_admin(user)
@@ -138,6 +140,7 @@ def create_user(payload: schemas.UserCreate, db: Session = Depends(get_db), user
     db.refresh(u)
     return u
 
+@router.patch("/{user_id}/role/", response_model=schemas.UserOut)
 @router.patch("/{user_id}/role", response_model=schemas.UserOut)
 def update_user_role(user_id: int, payload: schemas.UserRoleUpdate, db: Session = Depends(get_db), user=Depends(get_current_user)):
     require_admin(user)
