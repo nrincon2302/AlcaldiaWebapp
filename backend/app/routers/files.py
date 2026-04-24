@@ -41,6 +41,7 @@ GCS_PREFIX = os.getenv("GCS_PREFIX", "evidence/").lstrip("/")
 
 router = APIRouter(prefix="/files", tags=["files"])
 
+@router.post("/upload/", status_code=status.HTTP_201_CREATED)
 @router.post("/upload", status_code=status.HTTP_201_CREATED)
 async def upload_evidence(file: UploadFile = File(...)) -> Dict[str, str]:
     # 1) Validación de tipo MIME

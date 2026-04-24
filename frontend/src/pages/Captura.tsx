@@ -18,6 +18,18 @@ type Section = {
 };
 
 /* ======================== DATA ======================== */
+const CAPTURA_BASE = (((import.meta as any).env?.VITE_CAPTURA_BASE) || "").replace(/\/+$/, "");
+const DDC_PQRSD = (((import.meta as any).env?.VITE_DDC_PQRSD) || "").replace(/\/+$/, "");
+const DDC_CALPROC = (((import.meta as any).env?.VITE_DDC_CALPROC) || "").replace(/\/+$/, "");
+const DDC_COTEL = (((import.meta as any).env?.VITE_DDC_COTEL) || "").replace(/\/+$/, "");
+const DDC_COVRT = (((import.meta as any).env?.VITE_DDC_COVRT) || "").replace(/\/+$/, "");
+const DDC_COPR_CAPINS = (((import.meta as any).env?.VITE_DDC_COPR_CAPINS) || "").replace(/\/+$/, "");
+const DDC_COPR_STDYPRTC = (((import.meta as any).env?.VITE_DDC_COPR_STDYPRTC) || "").replace(/\/+$/, "");
+const DDC_SATEXP_PR = (((import.meta as any).env?.VITE_DDC_SATEXP_PR) || "").replace(/\/+$/, "");
+const DDC_SATEXP_CT = (((import.meta as any).env?.VITE_DDC_SATEXP_CT) || "").replace(/\/+$/, "");
+const DDC_SATEXP_CV = (((import.meta as any).env?.VITE_DDC_SATEXP_CV) || "").replace(/\/+$/, "");
+
+
 const DATA: Section[] = [
   {
     title: "Satisfacción y Experiencia",
@@ -29,22 +41,22 @@ const DATA: Section[] = [
           {
             title: "",
             items: [
-              { label: "Canal Presencial", url: "https://lively-begonia-ccf65e.netlify.app/external/presencial.html" },
+              { label: "Canal Presencial", url: "/external/presencial.html?baseUrl="+encodeURIComponent(DDC_SATEXP_PR) },
             ],
           },
           {
             title: "Canal Virtual",
             items: [
-              { label: "Chat", url: "https://lively-begonia-ccf65e.netlify.app/external/chat.html" },
-              { label: "Chatico", url: "https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=10&d[/data/mod1/gp1/p3]=&d[/data/mod1/gp1/p4]=&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=" },
-              { label: "Portales web", url: "https://lively-begonia-ccf65e.netlify.app/external/portal-web-entidad.html" },
-              { label: "Bogotá te escucha", url: "https://v3.proyectamos-odk.com/-/single/1UaQGsPPboVIARqE1DqJdoTyJDVN2Yz?st=6XwDkP3toPy1uO8gyPaPTUCr$k19hbRyDGT2hzTik2zbF62Uhuszq1gudKqBrSU4&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=9&d[/data/mod1/gp1/p3]=&d[/data/mod1/gp1/p4]=&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=" },
+              { label: "Chat", url: "/external/chat.html?baseUrl="+encodeURIComponent(DDC_SATEXP_CV) },
+              { label: "Chatico", url: DDC_SATEXP_CV+"&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=10&d[/data/mod1/gp1/p3]=&d[/data/mod1/gp1/p4]=&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=" },
+              { label: "Portales web", url: "/external/portal-web-entidad.html?baseUrl="+encodeURIComponent(DDC_SATEXP_CV) },
+              { label: "Bogotá te escucha", url: DDC_SATEXP_CV+"&d[/data/mod1/gp0/p0]=2&d[/data/mod1/gp0/p00]=9&d[/data/mod1/gp1/p3]=&d[/data/mod1/gp1/p4]=&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=" },
             ],
           },
           {
             title: "Canal Telefónico",
             items: [
-              { label: "Líneas telefónicas", url: "https://v3.proyectamos-odk.com/-/single/q9WhmBpv8Fj08a6JvImiA82RsLP1XH0?st=!OhjspL68zsDiNveCS!AurvRcLe1TTVwRIhS3VQzLQvckRfBtIfygfDgsif5gF5Z&d[/data/mod1/gp0/p0]=3&d[/data/mod1/gp0/p00]=8&d[/data/mod1/gp1/p3]=&d[/data/mod1/gp1/p4]=&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=" },
+              { label: "Líneas telefónicas", url: DDC_SATEXP_CT+"&d[/data/mod1/gp0/p0]=3&d[/data/mod1/gp0/p00]=8&d[/data/mod1/gp1/p3]=&d[/data/mod1/gp1/p4]=&d[/data/mod1/gp1/p01]=&d[/data/mod1/gp1/c5]=" },
             ],
           },
         ],
@@ -55,17 +67,17 @@ const DATA: Section[] = [
   {
     title: "Prestación del Servicio",
     items: [
-      { label: "Calificación de PQRSD", url: "https://v3.proyectamos-odk.com/-/single/wvK5vmKyy0Emb2Cw7qE24PKqF7fb1m8?st=shDv8Tab2VoXIT7y5z8LHCY8yUGXo2X610QkerUzeO7CFHtMhZT19kKOD79ZM2a7" },
-      { label: "Calificación de Procesos", url: "https://v3.proyectamos-odk.com/-/ra1YVOFwob1cKdT9MEKym2TGL07D8l7?st=Mns9zPLD7nxnv95FozmNc9ZDkY9xrEin4aiXJBmD3ib8Ct3KLRq0sNeWUmtfBYVz" },
-      { label: "Capacidad instalada", url: "https://v3.proyectamos-odk.com/-/kfGUXkKFWCvKL0x0uekN7hdfen98YYP?st=rkJpo9UkDVoyeTnDa3!61w$hzM85khM3aKqbudECZ8HICdiU1kKuIC7eHtG!xXVI&d[/data/mod1/gp1/p0]=1" },
+      { label: "Calificación de PQRSD", url: DDC_PQRSD },
+      { label: "Calificación de Procesos", url: DDC_CALPROC },
+      { label: "Capacidad instalada", url: DDC_COPR_CAPINS+"&d[/data/mod1/gp1/p0]=1" },
     ],
     subsections: [
       {
         title: "Cliente Oculto",
         items: [
-          { label: "Canal Presencial", url: "https://v3.proyectamos-odk.com/-/gPbnWiNfqnEDtYuQCHWrUd04YMZ73ZE?st=$D!33THY4S6e9$KrK!AbR6kXSx9XlbC57cxYt!b9TRTdTi1zyZLq8MreQKosHQtV&d[/data/mod1/gp1/p0]=1" },
-          { label: "Canal Virtual", url: "https://v3.proyectamos-odk.com/-/cinQZGeLvAcpjbWYSiPK0cmTcc1SkP6?st=2wtC932SOJNSl8iONeNSNgG74ZhQi!mVKtY5tMdGjXtwLcyt0tl76BzsUMWZtXZI&d[/data/mod1/gp1/p0]=2" },
-          { label: "Canal Telefónico", url: "https://v3.proyectamos-odk.com/-/QIo14qfC2tpHxrok6T87RpDabnJUrPu?st=c4n23qFAN1jiMMAZl8ow6gljqc1YDgeiW!Lf02TlUtGb5qgrTx0PUQNpc9K!gEIt&d[/data/mod1/gp1/p0]=3" },
+          { label: "Canal Presencial", url: DDC_COPR_STDYPRTC+"&d[/data/mod1/gp1/p0]=1" },
+          { label: "Canal Virtual", url: DDC_COVRT+"&d[/data/mod1/gp1/p0]=2" },
+          { label: "Canal Telefónico", url: DDC_COTEL+"&d[/data/mod1/gp1/p0]=3" },
         ],
       },
     ],
@@ -151,7 +163,7 @@ function PqrControl({ item, onPqrChange, pqrFuncionarioId, pqrPassword }: { item
       const origin = new URL(item.url ?? "").origin;
       return [origin, window.location.origin];
     } catch {
-      return ["https://v3.proyectamos-odk.com", window.location.origin];
+      return [CAPTURA_BASE, window.location.origin];
     }
   }, [item.url]);
 

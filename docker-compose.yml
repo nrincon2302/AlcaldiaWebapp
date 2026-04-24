@@ -25,6 +25,17 @@ services:
         VITE_API_URL: ${VITE_API_URL}
         VITE_SHINY_URL: ${VITE_SHINY_URL}
         SERVER_IP: ${SERVER_IP}
+        # Se ingresan como variables de entorno los enlaces de Enketo
+        VITE_CAPTURA_BASE: ${VITE_CAPTURA_BASE}
+        VITE_DDC_SATEXP_PR: ${VITE_DDC_SATEXP_PR}
+        VITE_DDC_SATEXP_CT: ${VITE_DDC_SATEXP_CT}
+        VITE_DDC_SATEXP_CV: ${VITE_DDC_SATEXP_CV}
+        VITE_DDC_PQRSD: ${VITE_DDC_PQRSD}
+        VITE_DDC_CALPROC: ${VITE_DDC_CALPROC}
+        VITE_DDC_COPR_CAPINS: ${VITE_DDC_COPR_CAPINS}
+        VITE_DDC_COPR_STDYPRTC: ${VITE_DDC_COPR_STDYPRTC}
+        VITE_DDC_COVRT: ${VITE_DDC_COVRT}
+        VITE_DDC_COTEL: ${VITE_DDC_COTEL}
     container_name: plan-accion-frontend
     environment:
       SERVER_IP: ${SERVER_IP}
