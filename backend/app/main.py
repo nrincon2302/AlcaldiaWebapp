@@ -25,7 +25,6 @@ cors_from_env = [o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if 
 
 DEFAULT_ALLOWED = [
     "http://localhost:5173",
-    "https://lively-begonia-ccf65e.netlify.app", 
 ]
 ALLOW_ORIGINS = cors_from_env or CORS_ORIGINS_DEFAULT or DEFAULT_ALLOWED  
 
