@@ -40,7 +40,7 @@ server {
     # LOW: Permissive CSP - se agrega object-src 'none' (faltaba) y report-to default
     # Nota: unsafe-inline en style-src se mantiene porque React/CSS-in-JS lo requiere;
     # eliminarlo requeriría refactorizar el frontend para usar nonces o hashes.
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; object-src 'none'; connect-src 'self' https://${SHINY_HOST}; frame-src https://${SHINY_HOST}; base-uri 'self'; form-action 'self'; report-to default;" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; img-src 'self' data: https: http:; font-src 'self'; object-src 'none'; connect-src 'self' https://${SHINY_HOST}; frame-src https://${SHINY_HOST}; base-uri 'self'; form-action 'self'; report-to default;" always;
 
     # ── Cache-Control ─────────────────────────────────────────
     location ~* \.html?$ {
@@ -48,7 +48,7 @@ server {
         add_header X-Frame-Options "DENY" always;
         add_header X-Content-Type-Options "nosniff" always;
         add_header Reporting-Endpoints "default=\"https://${SERVER_IP}/csp-report\"" always;
-        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; object-src 'none'; connect-src 'self' https://${SHINY_HOST}; frame-src https://${SHINY_HOST}; base-uri 'self'; form-action 'self'; report-to default;" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; img-src 'self' data: https: http:; font-src 'self'; object-src 'none'; connect-src 'self' https://${SHINY_HOST}; frame-src https://${SHINY_HOST}; base-uri 'self'; form-action 'self'; report-to default;" always;
         add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;

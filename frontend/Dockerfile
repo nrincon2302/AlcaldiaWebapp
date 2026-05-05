@@ -35,8 +35,7 @@ COPY . .
 RUN npm run build
 
 # ── Serve ────────────────────────────────────────────────────────────────────
-# HIGH: Nginx < 1.29.7 — mainline-alpine garantiza versión >= 1.29.7
-FROM nginx:mainline-alpine
+FROM nginx:mainline
 
 COPY --from=build /app/dist /usr/share/nginx/html
 
