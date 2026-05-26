@@ -1,9 +1,9 @@
 import React from "react";
-import { FiInfo } from "react-icons/fi";
+import { FiInfo, FiDownload, FiTrash2 } from "react-icons/fi";
 
 import { useAuth } from "../../context/AuthContext";
 import { hasAuditorAccess } from "../../lib/auth";
-import { uploadEvidence } from "../../lib/api";
+import { uploadEvidence, downloadFile, deleteFile } from "../../lib/api";
 
 type TipoAccion = "Preventiva" | "Correctiva" | "";
 type InsumoMejora =
@@ -844,7 +844,18 @@ export default function SeguimientoForm({
                 const raw = value.evidencia_cumplimiento ?? "";
                 const isUrl =
                   typeof raw === "string" &&
-                  (raw.startsWith("http://") || raw.startsWith("https://"));
+                  (raw.startsWith("http://") || raw.startsWith("https://") || raw.startsWith("/files/download/"));
+
+                // Extraer file_id de la URL si es del nuevo sistema
+                const extractFileIdFromUrl = (url: string): string | null => {
+                  if (url.includes("/files/download/")) {
+                    const parts = url.split("/");
+                    return parts[parts.length - 1] || null;
+                  }
+                  return null;
+                };
+
+                const fileId = isUrl ? extractFileIdFromUrl(raw) : null;
 
                 if (!isUrl) {
                   return (
@@ -956,27 +967,147 @@ export default function SeguimientoForm({
                   );
                 }
 
+                // ===== Archivo ya cargado =====
                 return (
-                  <div className="flex items-center justify-between rounded-lg border p-3">
-                    <a
-                      href={raw}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="truncate text-sm font-medium underline"
-                    >
-                      Ver evidencia
-                    </a>
-                    {(isAdmin || isEntidad) &&
-                      canEditCamposEntidadSeguimiento &&
-                      !ro["evidencia_cumplimiento"] && (
+                  <div className="space-y-2">
+                    {/* Card del archivo */}
+                    <div className="flex flex-col items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4">
+                      {/* Ícono + Nombre + Tamaño */}
+                      <div className="flex items-center gap-3 w-full">
+                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-200 flex items-center justify-center">
+                          <span className="text-lg">📎</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <a
+                            href={raw}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="truncate text-sm font-semibold text-green-700 underline hover:text-green-900 block"
+                            title={raw}
+                          >
+                            {raw.split("/").pop() || "archivo.pdf"}
+                          </a>
+                          <p className="text-xs text-green-600 mt-1">✓ Archivo adjuntado</p>
+                        </div>
+                      </div>
+
+                      {/* Botones de acción */}
+                      <div className="flex flex-wrap gap-2 w-full border-t border-green-200 pt-3">
+                        {/* Botón Descargar */}
                         <button
                           type="button"
-                          onClick={() => onChange("evidencia_cumplimiento", "")}
-                          className="rounded-xl bg-red-50 px-3 py-1 text-sm font-medium text-red-600 hover:bg-red-100"
+                          onClick={() => {
+                            if (fileId) {
+                              downloadFile(fileId, raw.split("/").pop() || "archivo");
+                            } else {
+                              window.open(raw, "_blank");
+                            }
+                          }}
+                          className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs font-medium transition"
+                          title="Descargar archivo"
                         >
-                          Quitar
+                          <FiDownload className="w-4 h-4" />
+                          Descargar
                         </button>
+
+                        {/* Botón Eliminar */}
+                        {(isAdmin || isEntidad) &&
+                          canEditCamposEntidadSeguimiento &&
+                          !ro["evidencia_cumplimiento"] && (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                if (
+                                  !fileId ||
+                                  !window.confirm(
+                                    "¿Estás seguro de que deseas eliminar este archivo?"
+                                  )
+                                ) {
+                                  return;
+                                }
+                                try {
+                                  setEviError(null);
+                                  setEviUploading(true);
+                                  await deleteFile(fileId);
+                                  onChange("evidencia_cumplimiento", "");
+                                } catch (err: any) {
+                                  setEviError(err?.message || "Error eliminando archivo");
+                                } finally {
+                                  setEviUploading(false);
+                                }
+                              }}
+                              disabled={eviUploading || !fileId}
+                              className="flex items-center gap-2 px-3 py-2 rounded-md bg-red-50 text-red-600 hover:bg-red-100 text-xs font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Eliminar archivo"
+                            >
+                              <FiTrash2 className="w-4 h-4" />
+                              Eliminar
+                            </button>
+                          )}
+
+                        {/* Botón Cambiar (Reemplazar) */}
+                        {canEditCamposEntidadSeguimiento && !ro["evidencia_cumplimiento"] && (
+                          <label className="flex items-center gap-2 px-3 py-2 rounded-md bg-amber-50 text-amber-600 hover:bg-amber-100 text-xs font-medium transition cursor-pointer">
+                            <span>📤 Reemplazar</span>
+                            <input
+                              type="file"
+                              accept={[
+                                ".jpg",
+                                ".jpeg",
+                                ".png",
+                                ".gif",
+                                ".pdf",
+                                ".xls",
+                                ".xlsx",
+                                ".csv",
+                                ".zip",
+                                ".rar",
+                                ".7z",
+                              ].join(",")}
+                              onChange={async (e) => {
+                                const file = e.currentTarget.files?.[0];
+                                if (!file) return;
+
+                                if (file.size > MAX_UPLOAD_BYTES) {
+                                  setEviError(
+                                    `El archivo supera ${MAX_UPLOAD_MB} MB. Reduce el tamaño y vuelve a intentar.`
+                                  );
+                                  e.currentTarget.value = "";
+                                  return;
+                                }
+
+                                try {
+                                  setEviError(null);
+                                  setEviUploading(true);
+                                  const { href } = await uploadEvidence(file);
+                                  onChange("evidencia_cumplimiento", href as any);
+                                  e.currentTarget.value = "";
+                                } catch (err: any) {
+                                  setEviError(err?.message || "Error subiendo archivo");
+                                  e.currentTarget.value = "";
+                                } finally {
+                                  setEviUploading(false);
+                                }
+                              }}
+                              className="hidden"
+                              disabled={eviUploading}
+                            />
+                          </label>
+                        )}
+                      </div>
+
+                      {/* Mensajes de estado */}
+                      {eviUploading && (
+                        <p className="text-xs text-gray-600 border-t border-green-200 pt-2 w-full">
+                          ⏳ Procesando...
+                        </p>
                       )}
+                      {eviError && (
+                        <p className="text-xs text-red-600 border-t border-green-200 pt-2 w-full">
+                          ❌ {eviError}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 );
               })()}

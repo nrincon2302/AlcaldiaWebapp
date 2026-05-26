@@ -88,6 +88,22 @@ class Seguimiento(Base):
         return self.updated_by.entidad if self.updated_by else None
 
 
+# Modelo para archivos subidos
+class UploadedFile(Base):
+    __tablename__ = "uploaded_files"
+    id = Column(Integer, primary_key=True, index=True)
+    file_id = Column(String(100), unique=True, nullable=False, index=True)  # UUID único
+    original_filename = Column(String(500), nullable=False)
+    stored_filename = Column(String(500), nullable=False)  # nombre en disco
+    file_path = Column(String(1000), nullable=False)  # ruta relativa
+    content_type = Column(String(100), nullable=False)
+    file_size = Column(Integer, nullable=False)  # en bytes
+    uploaded_by_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    uploaded_by = relationship("User", foreign_keys=[uploaded_by_id])
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    description = Column(Text, nullable=True)  # descripción opcional
+
+
 # Creación de clase Reporte para almacenar datos de automatización de reportes
 class Reporte(Base):
     __tablename__ = "reportes"

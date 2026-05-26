@@ -194,73 +194,74 @@ export async function api(path: string, options: RequestInit = {}) {
   throw lastErr;
 }
 // ====== UPLOAD: Evidencia (imágenes, PDF, Excel, comprimidos) ======
-export async function uploadEvidence( file: File
+/**
+ * Sube un archivo de evidencia al servidor (almacenamiento local + PostgreSQL)
+ * @param file Archivo a subir
+ * @returns Objeto con href, fileId, filename y content_type
+ */
+export async function uploadEvidence(
+  file: File
 ): Promise<{
   href: string;
-  publicUrl: string | null;
-  url: string | null;
+  fileId: string;
   filename: string;
   content_type: string;
 }> {
   if (!file) throw new Error("No hay archivo");
+  
   const allowedTypes = new Set<string>([
-    // Imágenes
-    "image/jpeg",
-    "image/png",
-    "image/gif",
-    // PDF
+    "image/jpeg", "image/png", "image/gif",
     "application/pdf",
-    // Excel / CSV
     "application/vnd.ms-excel",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     "text/csv",
-    // Comprimidos
-    "application/zip",
-    "application/x-zip-compressed",
-    "application/x-rar-compressed",
-    "application/x-7z-compressed",
+    "application/zip", "application/x-zip-compressed",
+    "application/x-rar-compressed", "application/x-7z-compressed",
   ]);
-  const allowedExts = new Set<string>([
-    "jpg",
-    "jpeg",
-    "png",
-    "gif",
-    "pdf",
-    "xls",
-    "xlsx",
-    "csv",
-    "zip",
-    "rar",
-    "7z",
-  ]);
+  
+  const allowedExts = new Set(["jpg", "jpeg", "png", "gif", "pdf", "xls", "xlsx", "csv", "zip", "rar", "7z"]);
 
   const typeOk = file.type ? allowedTypes.has(file.type) : false;
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
   const extOk = allowedExts.has(ext);
 
   if (!typeOk && !extOk) {
-    throw new Error(
-      "Formatos permitidos: imágenes (JPG, PNG), PDF, Excel (XLS/XLSX/CSV) y comprimidos (ZIP, RAR, 7Z)"
-    );
+    throw new Error("Formatos permitidos: imágenes (JPG, PNG), PDF, Excel (XLS/XLSX/CSV) y comprimidos (ZIP, RAR, 7Z)");
   }
+
   const form = new FormData();
   form.append("file", file);
 
-  const res = await api("/files/upload", { method: "POST", body: form });
-  
-  const json = res; 
-  const href =
-    (json && json.public_url) ? json.public_url
-    : (json && json.url)       ? toAbsolute(json.url)
-    : null;
-  if (!href) throw new Error("Respuesta inválida del servidor de archivos");
+  const json = await api("/files/upload", { method: "POST", body: form });
+
   return {
-    href,                        // <- úsalo directamente en el <a href=...>
-    publicUrl: json.public_url || null,
-    url: json.url || null,       // ruta relativa si estás en modo local
+    href: toAbsolute(json.download_url),
+    fileId: json.file_id,
     filename: json.filename,
     content_type: json.content_type,
   };
+}
+
+/**
+ * Descarga un archivo por su file_id
+ * @param fileId UUID del archivo
+ * @param filename Nombre para guardar (opcional)
+ */
+export function downloadFile(fileId: string, filename?: string) {
+  const link = document.createElement("a");
+  link.href = buildUrl(`/files/download/${fileId}`);
+  link.download = filename || `archivo-${fileId}`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+/**
+ * Elimina un archivo por su file_id (requiere autenticación)
+ * @param fileId UUID del archivo
+ */
+export async function deleteFile(fileId: string): Promise<{ message: string }> {
+  return api(`/files/delete/${fileId}`, { method: "DELETE" });
 }
 
 // ---- Añadimos helpers tipo api.post, api.get, api.put, api.delete ----
