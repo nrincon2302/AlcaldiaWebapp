@@ -6,7 +6,6 @@ import os
 import shutil
 import uuid
 import pathlib
-from datetime import datetime
 from app.database import get_db
 from app.models import UploadedFile, User
 from app.dependencies import get_current_user
@@ -200,7 +199,14 @@ async def delete_file(
         print(f"Advertencia: No se pudo eliminar archivo en disco: {e}")
     
     # 4) Eliminar registro de BD
-    db.delete(db_file)
-    db.commit()
+    try:
+        db.delete(db_file)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error al eliminar de la base de datos: {str(e)}"
+        )
     
     return {"message": "Archivo eliminado exitosamente"}

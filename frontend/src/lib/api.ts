@@ -95,15 +95,23 @@ function buildUrl(path: string): string {
   const [pathname0, search = ""] = raw.split("?");
   let pathname = pathname0.replace(/\/{2,}/g, "/");
 
-  // El backend ya registra las rutas con y sin slash (ej: @router.get("") + @router.get("/")).
   if (!pathname.endsWith("/")) {
     pathname += "/";
   }
 
-  // Sin VITE_API_URL → URLs relativas; nginx las proxea al backend.
-  // Con VITE_API_URL → URLs absolutas (útil para llamadas fuera del proxy).
   if (!BASE) {
     return `${pathname}${search ? "?" + search : ""}`;
+  }
+
+  // Si el hostname de BASE coincide con el de la página actual (sin importar
+  // protocolo ni puerto), usar URL relativa para que nginx haga el proxy.
+  // Esto evita violaciones CSP cuando la página es https:// y BASE es http://.
+  if (typeof window !== "undefined") {
+    try {
+      if (new URL(BASE).hostname === window.location.hostname) {
+        return `${pathname}${search ? "?" + search : ""}`;
+      }
+    } catch { /* BASE no es una URL absoluta válida, continuar */ }
   }
 
   return `${BASE}${pathname}${search ? "?" + search : ""}`;
@@ -193,6 +201,7 @@ export async function api(path: string, options: RequestInit = {}) {
 
   throw lastErr;
 }
+
 // ====== UPLOAD: Evidencia (imágenes, PDF, Excel, comprimidos) ======
 /**
  * Sube un archivo de evidencia al servidor (almacenamiento local + PostgreSQL)
@@ -243,7 +252,7 @@ export async function uploadEvidence(
 }
 
 /**
- * Descarga un archivo por su file_id
+ * Descarga un archivo por su file_id (URL relativa para evitar CSP)
  * @param fileId UUID del archivo
  * @param filename Nombre para guardar (opcional)
  */
@@ -257,12 +266,32 @@ export function downloadFile(fileId: string, filename?: string) {
 }
 
 /**
- * Elimina un archivo por su file_id (requiere autenticación)
+ * Elimina un archivo por su file_id (URL relativa para evitar CSP)
+ * Requiere autenticación
  * @param fileId UUID del archivo
  */
-export async function deleteFile(fileId: string): Promise<{ message: string }> {
-  return api(`/files/delete/${fileId}`, { method: "DELETE" });
-}
+export async function deleteFile(fileId: string): Promise<boolean> {
+  const token = localStorage.getItem("token");
+  
+  try {
+    const response = await fetch(`/files/delete/${fileId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || "Error al eliminar archivo");
+    }
+
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
 
 // ---- Añadimos helpers tipo api.post, api.get, api.put, api.delete ----
 export namespace api {

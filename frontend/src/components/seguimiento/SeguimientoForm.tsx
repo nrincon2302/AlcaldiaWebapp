@@ -972,11 +972,9 @@ export default function SeguimientoForm({
                   <div className="space-y-2">
                     {/* Card del archivo */}
                     <div className="flex flex-col items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4">
-                      {/* Ícono + Nombre + Tamaño */}
+                      {/* Nombre + Estado */}
                       <div className="flex items-center gap-3 w-full">
-                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-200 flex items-center justify-center">
-                          <span className="text-lg">📎</span>
-                        </div>
+                        <div className="flex-shrink-0 text-xl">📄</div>
                         <div className="flex-1 min-w-0">
                           <a
                             href={raw}
@@ -1017,21 +1015,29 @@ export default function SeguimientoForm({
                             <button
                               type="button"
                               onClick={async () => {
-                                if (
-                                  !fileId ||
-                                  !window.confirm(
-                                    "¿Estás seguro de que deseas eliminar este archivo?"
-                                  )
-                                ) {
+                                if (!fileId) {
+                                  setEviError("No se puede eliminar: archivo_id no encontrado");
                                   return;
                                 }
+                                
+                                if (!window.confirm("¿Estás seguro de que deseas eliminar este archivo?")) {
+                                  return;
+                                }
+                                
                                 try {
                                   setEviError(null);
                                   setEviUploading(true);
+                                  
+                                  // Eliminar del servidor
                                   await deleteFile(fileId);
+                                  
+                                  // Limpiar el campo en el formulario
                                   onChange("evidencia_cumplimiento", "");
+                                  
                                 } catch (err: any) {
-                                  setEviError(err?.message || "Error eliminando archivo");
+                                  const errorMsg = err?.message || "Error eliminando archivo";
+                                  console.error("Error al eliminar archivo:", errorMsg);
+                                  setEviError(errorMsg);
                                 } finally {
                                   setEviUploading(false);
                                 }
@@ -1051,40 +1057,34 @@ export default function SeguimientoForm({
                             <span>📤 Reemplazar</span>
                             <input
                               type="file"
-                              accept={[
-                                ".jpg",
-                                ".jpeg",
-                                ".png",
-                                ".gif",
-                                ".pdf",
-                                ".xls",
-                                ".xlsx",
-                                ".csv",
-                                ".zip",
-                                ".rar",
-                                ".7z",
-                              ].join(",")}
+                              accept={[".jpg",".jpeg",".png",".gif",".pdf",".xls",".xlsx",".csv",".zip",".rar",".7z"].join(",")}
                               onChange={async (e) => {
-                                const file = e.currentTarget.files?.[0];
-                                if (!file) return;
+                                const inputEl = e.currentTarget;
+                                const file = inputEl?.files?.[0];
+                                if (!file || !inputEl) return;
 
                                 if (file.size > MAX_UPLOAD_BYTES) {
-                                  setEviError(
-                                    `El archivo supera ${MAX_UPLOAD_MB} MB. Reduce el tamaño y vuelve a intentar.`
-                                  );
-                                  e.currentTarget.value = "";
+                                  setEviError(`El archivo supera ${MAX_UPLOAD_MB} MB.`);
+                                  if (inputEl) inputEl.value = "";
                                   return;
                                 }
 
                                 try {
                                   setEviError(null);
                                   setEviUploading(true);
+
+                                  // 1. Borrar el archivo anterior
+                                  if (fileId) {
+                                    try { await deleteFile(fileId); } catch { /* no fatal */ }
+                                  }
+
+                                  // 2. Subir el nuevo
                                   const { href } = await uploadEvidence(file);
-                                  onChange("evidencia_cumplimiento", href as any);
-                                  e.currentTarget.value = "";
+                                  if (inputEl) inputEl.value = "";
+                                  onChange("evidencia_cumplimiento" as any, href);
                                 } catch (err: any) {
                                   setEviError(err?.message || "Error subiendo archivo");
-                                  e.currentTarget.value = "";
+                                  if (inputEl) inputEl.value = "";
                                 } finally {
                                   setEviUploading(false);
                                 }

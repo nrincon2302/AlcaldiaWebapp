@@ -11,7 +11,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./backend/uploads:/app/uploads
+      - ./backend/uploads:/srv/uploads
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
       interval: 30s
