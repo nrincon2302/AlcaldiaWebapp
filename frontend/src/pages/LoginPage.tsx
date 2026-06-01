@@ -13,7 +13,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      const dest = user.role === "admin" ? "/captura" : "/seguimiento";
+      const dest = user.role === "admin" ? "/captura" : "/seguimientos";
       nav(dest, { replace: true });
     }
   }, [user, nav]);

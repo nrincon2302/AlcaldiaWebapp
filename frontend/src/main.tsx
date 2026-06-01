@@ -47,7 +47,7 @@ const router = createBrowserRouter([
         errorElement: <RouteErrorBoundary />
       },
       {
-        path: "/seguimiento",
+        path: "/seguimientos",
         element: (
           <PrivateRoute>
             <SeguimientoPage />

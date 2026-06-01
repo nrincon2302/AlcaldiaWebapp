@@ -58,7 +58,7 @@ export default function Header() {
 
               {/* Seguimiento: admin | auditor | entidad(reportes_seguimiento) */}
               {(isAdmin || isAuditor || entidadRepSeg) && (
-                <li><NavLink to="/seguimiento" className={navLinkClass}>Seguimiento</NavLink></li>
+                <li><NavLink to="/seguimientos" className={navLinkClass}>Seguimiento</NavLink></li>
               )}
             </ul>
           </nav>
@@ -149,7 +149,7 @@ export default function Header() {
 
             {/* Seguimiento: admin | auditor | entidad(reportes_seguimiento) */}
             {(isAdmin || isAuditor || entidadRepSeg) && (
-              <li><NavLink to="/seguimiento" className={navLinkClass}>Seguimiento</NavLink></li>
+              <li><NavLink to="/seguimientos" className={navLinkClass}>Seguimiento</NavLink></li>
             )}
           </ul>
 

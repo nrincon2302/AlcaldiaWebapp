@@ -24,7 +24,7 @@ export default function PrivateRoute({ children }: { children: JSX.Element }) {
   const path = location.pathname;
 
   if (role === "entidad" && !isAuditorAccess) {
-    if (perm === "captura_reportes" && path.startsWith("/seguimiento")) {
+    if (perm === "captura_reportes" && path.startsWith("/seguimientos")) {
       return <Navigate to="/reportes" replace />;
     }
   }
