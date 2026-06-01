@@ -2,12 +2,8 @@ const BASE = (((import.meta as any).env?.VITE_API_URL) || "").replace(/\/+$/, ""
 export const API_URL: string = BASE;
 
 const TIMEOUT_MS = 8000; // 8s por si hay cold start
+const UPLOAD_TIMEOUT_MS = 120_000; // 2 min para uploads grandes
 const RETRIES = 1;       // 1 reintento rápido
-const RUTAS = {
-  enviar:          (id: number) => `/seguimiento/${id}/enviar`,
-  solicitarCambios:(id: number) => `/seguimiento/${id}/solicitar-cambios`,
-  aprobar:         (id: number) => `/seguimiento/${id}/aprobar`,
-};
  
 // ====== UTIL: construir URL absoluta hacia el backend (uploads, etc.) ======
 export function toAbsolute(urlPath: string): string {
@@ -84,8 +80,8 @@ function withTimeout<T>(p: Promise<T>, ms = TIMEOUT_MS) {
   });
 }
 
-async function doFetch(url: string, init?: RequestInit) {
-  return withTimeout(fetch(url, { ...init, credentials: "omit" }));
+async function doFetch(url: string, init?: RequestInit, timeoutMs = TIMEOUT_MS) {
+  return withTimeout(fetch(url, { ...init, credentials: "omit" }), timeoutMs);
 }
 
 function buildUrl(path: string): string {
@@ -138,12 +134,13 @@ export async function api(path: string, options: RequestInit = {}) {
 
   for (let i = 0; i <= RETRIES; i++) {
     try {
+      const isUpload = options.body instanceof FormData;
       const res = await doFetch(url, {
         ...options,
         headers,
         mode: "cors",
-        // credentials: "include", // si usas cookies entre dominios
-      });
+        // credentials: "include",
+      }, isUpload ? UPLOAD_TIMEOUT_MS : TIMEOUT_MS);
 
       if (res.status === 401 || res.status === 403) {
         // sesión expirada o sin permisos → marcamos "auth" y redirigimos
