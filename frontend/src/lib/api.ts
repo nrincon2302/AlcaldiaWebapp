@@ -129,17 +129,16 @@ export async function api(path: string, options: RequestInit = {}) {
     headers.set("Content-Type", "application/json");
   }
 
+  const isUpload = options.body instanceof FormData;
   const url = buildUrl(path);
   let lastErr: any;
 
   for (let i = 0; i <= RETRIES; i++) {
     try {
-      const isUpload = options.body instanceof FormData;
       const res = await doFetch(url, {
         ...options,
         headers,
         mode: "cors",
-        // credentials: "include",
       }, isUpload ? UPLOAD_TIMEOUT_MS : TIMEOUT_MS);
 
       if (res.status === 401 || res.status === 403) {
@@ -160,7 +159,7 @@ export async function api(path: string, options: RequestInit = {}) {
         // 5xx suele ser cold start o error temporal del back
         if (res.status >= 500) {
           // primer fallo: marcamos "reconnecting"
-           _emit("reconnecting", "Reintentando conexión con el servidor…");
+          _emit("reconnecting", "Reintentando conexión con el servidor…");
           throw Object.assign(new Error(`HTTP_${res.status}`), { code: "SERVER_ERROR" });
         }
         const msg = await res.text().catch(() => res.statusText);
@@ -182,7 +181,6 @@ export async function api(path: string, options: RequestInit = {}) {
       const serverLike = e?.code === "SERVER_ERROR";
 
       if (i < RETRIES && (netLike || serverLike)) {
-        // damos 1 segundo para que Cloud Run "despierte"
         _emit("reconnecting", "Reintentando conexión con el servidor…");
         await new Promise((r) => setTimeout(r, 1000));
         continue;
@@ -190,7 +188,9 @@ export async function api(path: string, options: RequestInit = {}) {
 
       // sin éxito tras el retry → "down"
       if (netLike || serverLike) {
-        _emit("down", "No se pudo conectar con el servidor. Intenta nuevamente.");
+        if (!isUpload) { // uploads no disparan logout
+          _emit("down", "No se pudo conectar con el servidor. Intenta nuevamente.");
+        }
       }
       throw e;
     }
