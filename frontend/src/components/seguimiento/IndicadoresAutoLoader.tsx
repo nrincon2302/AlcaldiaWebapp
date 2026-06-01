@@ -44,9 +44,10 @@ export default function IndicadoresAutoLoader({
       try {
         if (!nombreEntidad) return;
 
-        const res: any = await api(
-          `/reports/${encodeURIComponent(nombreEntidad)}`
-        );
+        let res: any = null;
+        if (nombreEntidad !== "Administrador" && nombreEntidad !== "Alcaldía Demo") {
+          res = await api(`/reports/${encodeURIComponent(nombreEntidad)}`);
+        }
         if (!mounted || !res) return;
 
         const toRowsFromObj = (obj: any): IndicadorApiRow[] => {

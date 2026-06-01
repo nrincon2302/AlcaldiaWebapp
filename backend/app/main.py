@@ -220,7 +220,7 @@ def _normalize_legacy_roles():
                     UPDATE "users"
                     SET role = 'entidad',
                         entidad_auditor = TRUE
-                    WHERE role = 'entidad_evaluador'
+                    WHERE role::text = 'entidad_evaluador'
                 """))
     except Exception as e:
         print(f"[WARN] _normalize_legacy_roles falló: {e}")

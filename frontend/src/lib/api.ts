@@ -258,7 +258,7 @@ export async function uploadEvidence(
  */
 export function downloadFile(fileId: string, filename?: string) {
   const link = document.createElement("a");
-  link.href = buildUrl(`/files/download/${fileId}`);
+  link.href = `/files/download/${fileId}`;
   link.download = filename || `archivo-${fileId}`;
   document.body.appendChild(link);
   link.click();
