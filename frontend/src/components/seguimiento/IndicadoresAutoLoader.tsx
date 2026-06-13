@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { api } from "../../lib/api";
 
 export type IndicadorApiRow = {
@@ -14,23 +14,6 @@ type Props = {
   onOptionsFromApi?: (rows: IndicadorApiRow[]) => void;
   nombreEntidad?: string | null;
 };
-
-const FALLBACK_ROWS: IndicadorApiRow[] = [
-  {
-    entidad: "Administrador",
-    indicador: "Indicador de satisfacción",
-    criterio: "Porcentaje de usuarios satisfechos",
-    accion: "Realizar encuesta trimestral a los usuarios",
-    insumo: "Dimensión de satisfacción del usuario",
-  },
-  {
-    entidad: "Administrador",
-    indicador: "Tiempo de respuesta a PQRS",
-    criterio: "Promedio de días para responder PQRS",
-    accion: "Implementar tablero de monitoreo diario",
-    insumo: "Dimensión de PQRS"
-  },
-];
 
 export default function IndicadoresAutoLoader({
   onImport,
@@ -118,10 +101,9 @@ export default function IndicadoresAutoLoader({
           .flatMap((obj: any) => toRowsFromObj(obj))
           .filter((x): x is IndicadorApiRow => !!x);
 
-        // Si no encontró nada, usamos fallback
+        // Si no encontró nada, no hacer nada
         if (!normalized.length) {
-          if (onOptionsFromApi && mounted) onOptionsFromApi(FALLBACK_ROWS);
-          return; // no auto-import para no pisar datos con fallback
+          return;
         }
 
         // Opciones para el <select> de Indicador
@@ -141,11 +123,7 @@ export default function IndicadoresAutoLoader({
           });
         }
       } catch (e) {
-        
-        if (onOptionsFromApi && mounted) {
-          onOptionsFromApi(FALLBACK_ROWS);
-        }
-        // No auto-importar fallback para evitar pisar entidad/indicador
+        // Sin fallback: dejar campos deshabilitados si hay error
       }
     };
 
