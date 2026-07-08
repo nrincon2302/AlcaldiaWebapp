@@ -43,12 +43,6 @@ services:
       SERVER_IP: ${SERVER_IP}
       SHINY_HOST: ${SHINY_HOST}
       BACKEND_HOST: ${BACKEND_HOST}
-    # MEDIUM: Self-signed cert — el cert se genera manualmente con mkcert
-    # Instrucciones:
-    #   mkcert <SERVER_IP>
-    #   mkdir ssl
-    #   mv <SERVER_IP>.pem ssl/cert.pem
-    #   mv <SERVER_IP>-key.pem ssl/key.pem
     volumes:
       - ./ssl:/etc/nginx/ssl:ro
     ports:
