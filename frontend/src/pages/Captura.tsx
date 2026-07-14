@@ -479,8 +479,11 @@ function PqrControl({ item, onPqrChange, pqrFuncionarioId, pqrPassword }: { item
           className="mt-1 w-full rounded-md border px-2 py-2 text-sm"
         >
           <option value={1}>Jairo Rico</option>
-          <option value={2}>Sandra Avila</option>
-          <option value={3}>Andrés Villamil</option>
+          <option value={2}>Sandra Ávila</option>
+          <option value={4}>Angela Noguera</option>
+          <option value={5}>Claudia Catolico</option>
+          <option value={6}>María Camila Velasquez</option>
+          <option value={7}>Mary Yully Herrera</option>
         </select>
 
         <label className="mt-3 block text-sm font-medium text-gray-700">Número de Validación</label>
